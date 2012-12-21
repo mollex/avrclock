@@ -14,6 +14,10 @@
 #include "gl.h"
 #include "font.h"
 
+
+void xinit_spi1 (void);		/* Initialize SPI port (asmfunc.S) */
+void xmit_spi1 (uint8_t d);		/* Send a byte to the MMC (asmfunc.S) */
+
 extern void uart_init();
 extern void GL_Test();
 extern void ht1632c_Init();
@@ -27,9 +31,25 @@ extern Font_t Font[];
 int main(void) {
 	uart_init();
 
+
+
 	printf("begin\\n\r");
 
 	dmdp10_Init();
+	xinit_spi1();
+
+//	_delay_ms(100);
+//	xmit_spi1(0x1);						/* Start + Command index */
+//	_delay_ms(100);
+//	xmit_spi1(0x3);						/* Start + Command index */
+//	_delay_ms(100);
+//	xmit_spi1(0x7);						/* Start + Command index */
+//	_delay_ms(100);
+//	xmit_spi1(0xF);						/* Start + Command index */
+//	_delay_ms(100);
+//
+//	while (1) {}
+
 
 	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
 	GL_SetPixel(0, 0, 1);
