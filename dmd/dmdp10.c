@@ -121,23 +121,7 @@ void dmdp10_Scan()
 
 	for (int i=0;i<2;i++) {
 
-		xlow_spi1(VideoBuf.vbuff[0][i][12 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][8 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][4 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][0 + chnl]);
-
-
-		xhigh_spi1(VideoBuf.vbuff[0][i][12 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][8 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][4 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][0 + chnl]);
-
-		/*xmit_spi1(VideoBuf.vbuff[0][i][12 + chnl]>>8);
-		xmit_spi1(VideoBuf.vbuff[0][i][8 + chnl]>>8);
-		xmit_spi1(VideoBuf.vbuff[0][i][4 + chnl]>>8);
-		xmit_spi1(VideoBuf.vbuff[0][i][0 + chnl]>>8);*/
-
-		/*spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
+		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]);
@@ -145,12 +129,9 @@ void dmdp10_Scan()
 		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]>>8);
 		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]>>8);
 		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);*/
+		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);
 
     }
-
-
-
 
 	OE_DMD_ROWS_OFF();
 	LATCH_DMD_SHIFT_REG_TO_OUTPUT();
@@ -192,5 +173,5 @@ void dmdp10_Init()
 	DDRD  = (1<<7) | (1<<6);
 	PORTD= 0x00;
 
-	//spi_init();
+	spi_init();
 }

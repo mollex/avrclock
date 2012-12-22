@@ -129,6 +129,7 @@ static void GL_Uart()
 	memset(VideoBuf.vbuff, 0, sizeof(VideoBuf.vbuff));
 }
 
+/*
 static void GL_Ht1632()
 {
 	int xl, yl, l, addr;
@@ -169,17 +170,18 @@ static void GL_Ht1632()
 	}
 	//memset(VideoBuf.vbuff, 0, sizeof(VideoBuf.vbuff));
 }
-
+*/
 
 void GL_Clear()
 {
-	ht1632c_memset(3, 0x00, 0, 64);
+	//ht1632c_memset(3, 0x00, 0, 64);
 }
+
 void GL_Show()
 {
 	// GL_Uart();
 
-	 GL_Ht1632();
+	// GL_Ht1632();
 }
 
 void GL_SetPixel(uint16_t x, uint16_t y, uint8_t val)

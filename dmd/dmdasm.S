@@ -7,8 +7,6 @@
 	a 16-bit value in R25:R24, up to 32-bits in R22:R23:R24:R25. 8-bit return values are zero/sign-extended
 	to 16-bits by the called function.
 */
-//#define	DDR_CS	_SFR_IO_ADDR(DDRC), 0	// MMC CS pin (DDR, PORT)
-//#define	PORT_CS	_SFR_IO_ADDR(PORTC), 0
 
 #define	DDR_CK1	_SFR_IO_ADDR(DDRB), 5
 #define	PORT_CK1	_SFR_IO_ADDR(PORTB), 5
