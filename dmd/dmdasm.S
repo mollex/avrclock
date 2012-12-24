@@ -50,10 +50,10 @@ xlow_spi1:
 	sbrs	r24, 0		;
 	sbi	PORT_MOSI1		; /
 	sbi	PORT_CK1		; A positive pulse to SCLK
-	lsr	r24		; Get DO from MMC
+	lsr	r24				; Get DO from MMC
 	cbi	PORT_CK1		; /
-	dec	r26		; Repeat 8 times
-	brne	1b		; /
+	dec	r26				; Repeat 8 times
+	brne	1b			; /
 	ret
 .endfunc
 
@@ -71,10 +71,10 @@ xhigh_spi1:
 	sbrs	r25, 0		;
 	sbi	PORT_MOSI1		; /
 	sbi	PORT_CK1		; A positive pulse to SCLK
-	lsr	r25		; Get DO from MMC
+	lsr	r25				; Get DO from MMC
 	cbi	PORT_CK1		; /
-	dec	r26		; Repeat 8 times
-	brne	2b		; /
+	dec	r26				; Repeat 8 times
+	brne	2b			; /
 	ret
 .endfunc
 

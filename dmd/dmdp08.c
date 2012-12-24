@@ -100,8 +100,10 @@ LED Panel Layout in RAM
 
 /************************** Function Prototypes ******************************/
 void xinit_spi1 (void);		/* Initialize SPI port */
-void xlow_spi1(uint8_t d);		/* Send a byte  */
-void xhigh_spi1(uint8_t d);		/* Send a byte  */
+void xlow_spi1(uint16_t d);		/* Send a byte  */
+void xhigh_spi1(uint16_t d);	/* Send a byte  */
+
+void dmdp08_Scan();
 
 extern VideoBuf_t	VideoBuf;
 
@@ -176,6 +178,12 @@ void dmdp08_Scan()
  ***************************************************************************/
 void dmdp08_Init()
 {
+	DDRB  = (1<<0) | (1<<1);
+	PORTB = 0x00;
+
+	DDRD  = (1<<7) | (1<<6);
+	PORTD= 0x00;
+
 	xinit_spi1();
 
 	TCCR0B = 1<<CS02;			//divide by 256

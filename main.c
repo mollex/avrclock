@@ -10,13 +10,10 @@
 
 #include <avr/io.h>
 #include <avr/delay.h>
+#include <avr/interrupt.h>
 
 #include "gl.h"
 #include "font.h"
-
-
-void xinit_spi1 (void);		/* Initialize SPI port (asmfunc.S) */
-void xmit_spi1 (uint8_t d);		/* Send a byte to the MMC (asmfunc.S) */
 
 extern void uart_init();
 extern void GL_Test();
@@ -28,6 +25,7 @@ extern void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, 
 
 extern VideoBuf_t	VideoBuf;
 extern Font_t Font[];
+int val = 0;
 int main(void) {
 	uart_init();
 
@@ -35,8 +33,10 @@ int main(void) {
 
 	printf("begin\\n\r");
 
-	dmdp10_Init();
-	xinit_spi1();
+	//dmdp10_Init();
+	dmdp08_Init();
+
+	sei();
 
 //	_delay_ms(100);
 //	xmit_spi1(0x1);						/* Start + Command index */
@@ -52,33 +52,32 @@ int main(void) {
 
 
 	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
-	GL_SetPixel(0, 0, 1);
-	GL_SetPixel(2, 2, 1);
-	GL_SetPixel(0, 5, 1);
+	GL_DrawNumber(&Font[0], 0, 0,1234,1);
 
-	GL_DrawNumber(&Font[1], 0, 0,1234,1);
-
-	//VideoBuf.vbuff[0][0][0] = 0x11;
-	//VideoBuf.vbuff[0][0][1] = 0x22;
 	while (1) {
 
 		memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
-		GL_DrawNumber(&Font[0], 0, 0,1234,1);
-		int j = 2000;
+		GL_DrawNumber(&Font[0], val & 0x1f, 0,12345,1);
+		GL_DrawNumber(&Font[0], 0, 9,val++,1);
+
+		_delay_ms(500);
+
+		/*int j = 2000;
 		while(j--)
 		{
-		dmdp10_Scan();
-		_delay_ms(1);
-		}
+			dmdp08_Scan();
+			_delay_ms(1);
+		}*/
 
-		memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
+
+	/*	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
 		GL_DrawNumber(&Font[1], 0, 5,1284,1);
 		 j = 2000;
 		while(j--)
 		{
 		dmdp10_Scan();
 		_delay_ms(1);
-		}
+		}*/
 
 	}
 
