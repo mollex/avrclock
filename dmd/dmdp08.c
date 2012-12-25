@@ -60,20 +60,6 @@ LED Panel Layout in RAM
 #include "gl.h"
 /************************** Constant Definitions ****************************/
 
-// ######################################################################################################################
-// ######################################################################################################################
-//#warning CHANGE THESE TO SEMI-ADJUSTABLE PIN DEFS!
-//Arduino pins used for the display connection
-#define PIN_DMD_nOE       9    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
-#define PIN_DMD_A         6    // D6
-#define PIN_DMD_B         7    // D7
-#define PIN_DMD_CLK       13   // D13_SCK  is SPI Clock if SPI is used
-#define PIN_DMD_SCLK      8    // D8
-#define PIN_DMD_R_DATA    11   // D11_MOSI is SPI Master Out if SPI is used
-//Define this chip select pin that the Ethernet W5100 IC or other SPI device uses
-//if it is in use during a DMD scan request then scanDisplayBySPI() will exit without conflict! (and skip that scan)
-#define PIN_OTHER_SPI_nCS 10
-
 /**************************** Type Definitions ******************************/
 
 /***************** Macros (Inline Functions) Definitions ********************/
@@ -87,23 +73,39 @@ LED Panel Layout in RAM
 
 
 //DMD I/O pin macros
-#define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORTD, 7 ); cbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORTD, 7 ); sbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_03_07_11_15()       { sbi( PORTD, 7 ); cbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_04_08_12_16()       { sbi( PORTD, 7 ); sbi( PORTD, 6 ); }
+#define _mDMD_ROW_INIT()    { sbi( DDRD, 2 ); sbi( DDRD, 3 ); sbi( DDRD, 4 ); sbi( DDRD, 5 ); }
+#define _mDMD_ROW(a) 		{ PORTD = (PORTD & (~((1<<2) | (1<<3) | (1<<4) | (1<<5))) ) | (a<<2);}
+#define _mDMD_ROW_01()      { cbi( PORTD, 2 ); cbi( PORTD, 3 ); cbi( PORTD, 4 ); cbi( PORTD, 5 ); }
+#define _mDMD_ROW_02()      { sbi( PORTD, 2 ); cbi( PORTD, 3 ); cbi( PORTD, 4 ); cbi( PORTD, 5 ); }
+#define _mDMD_ROW_03()      { cbi( PORTD, 2 ); sbi( PORTD, 3 ); cbi( PORTD, 4 ); cbi( PORTD, 5 ); }
+#define _mDMD_ROW_04()      { sbi( PORTD, 2 ); sbi( PORTD, 3 ); sbi( PORTD, 4 ); sbi( PORTD, 5 ); }
 
-#define LATCH_DMD_SHIFT_REG_TO_OUTPUT()   { sbi( PORTB, 0 ); cbi( PORTB,  0 ); }
-#define OE_DMD_ROWS_OFF()                 { cbi( PORTB, 1 ); }
-#define OE_DMD_ROWS_ON()                  { sbi( PORTB, 1 ); }
+#define _mDMD_LATCH_INIT()   		{ sbi( DDRB, 0 ); }
+#define _mDMD_LATCH()   	{ sbi( PORTB, 0 ); cbi( PORTB,  0 ); }
+
+#define _mDMD_OE_INIT()     { sbi( DDRB, 1 ); }
+#define _mDMD_OE_OFF()      { cbi( PORTB, 1 ); }
+#define _mDMD_OE_ON()       { sbi( PORTB, 1 ); }
+
+#define _mDMD_G1_INIT()     { sbi( DDRD, 7 ); }
+#define _mDMD_G1_OFF()      { cbi( PORTD, 7 ); }
+#define _mDMD_G1_ON()       { sbi( PORTD, 7 ); }
+
+#define _mDMD_G2_INIT()     { sbi( DDRD, 6 ); }
+#define _mDMD_G2_OFF()      { cbi( PORTD, 6 ); }
+#define _mDMD_G2_ON()       { sbi( PORTD, 6 ); }
 
 /************************** Variable Definitions ****************************/
 
 /************************** Function Prototypes ******************************/
-void xinit_spi1 (void);		/* Initialize SPI port */
+void xinit_spi1(void);		/* Initialize SPI port */
 void xlow_spi1(uint16_t d);		/* Send a byte  */
 void xhigh_spi1(uint16_t d);	/* Send a byte  */
 
+void xinit_spi2(void);		/* Initialize SPI port */
+
 void dmdp08_Scan();
+
 
 extern VideoBuf_t	VideoBuf;
 
@@ -130,41 +132,22 @@ void dmdp08_Scan()
 {
 	static uint8_t chnl = 0;
 
-	if(chnl>3) chnl = 0;
+	if(chnl>15) chnl = 0;
 
-	for (int i=0;i<2;i++) {
+	for (int i=0;i<4;i++) {
+		xlow_spi1(VideoBuf.vbuff[0][i][chnl]);
+		xhigh_spi1(VideoBuf.vbuff[0][i][chnl]);
+		//xlow_spi1(VideoBuf.vbuff[0][1][chnl]);
+		//xhigh_spi1(VideoBuf.vbuff[0][1][chnl]);
+	}
 
-		xlow_spi1(VideoBuf.vbuff[0][i][12 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][8 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][4 + chnl]);
-		xlow_spi1(VideoBuf.vbuff[0][i][0 + chnl]);
+    //_mDMD_OE_ON();
 
-		xhigh_spi1(VideoBuf.vbuff[0][i][12 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][8 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][4 + chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][0 + chnl]);
+	_mDMD_LATCH();
 
-    }
+	_mDMD_ROW(chnl);
 
-	OE_DMD_ROWS_OFF();
-	LATCH_DMD_SHIFT_REG_TO_OUTPUT();
-
-    switch (chnl) {
-       case 0:			// row 1, 5, 9, 13 were clocked out
-           LIGHT_DMD_ROW_01_05_09_13();
-           break;
-       case 1:			// row 2, 6, 10, 14 were clocked out
-           LIGHT_DMD_ROW_02_06_10_14();
-           break;
-       case 2:			// row 3, 7, 11, 15 were clocked out
-           LIGHT_DMD_ROW_03_07_11_15();
-           break;
-       case 3:			// row 4, 8, 12, 16 were clocked out
-           LIGHT_DMD_ROW_04_08_12_16();
-           break;
-       }
-
-	OE_DMD_ROWS_ON();
+	_mDMD_OE_OFF();
 
 	chnl++;
 }
@@ -178,13 +161,14 @@ void dmdp08_Scan()
  ***************************************************************************/
 void dmdp08_Init()
 {
-	DDRB  = (1<<0) | (1<<1);
-	PORTB = 0x00;
-
-	DDRD  = (1<<7) | (1<<6);
-	PORTD= 0x00;
+	_mDMD_ROW_INIT();
+	_mDMD_LATCH_INIT();
+	_mDMD_OE_INIT();
+	_mDMD_G1_INIT(); _mDMD_G1_OFF();
+	_mDMD_G2_INIT(); _mDMD_G2_OFF();
 
 	xinit_spi1();
+	xinit_spi2();
 
 	TCCR0B = 1<<CS02;			//divide by 256
 	TIMSK0 = 1<<TOIE0;			//enable timer interrupt

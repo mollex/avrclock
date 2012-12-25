@@ -26,7 +26,7 @@
 #include <stdint.h>
 /************************** Constant Definitions ****************************/
 #define VBUFF_X_MAX		64
-#define VBUFF_Y_MAX		16
+#define VBUFF_Y_MAX		32
 
 #define VBUFF_X_LINE		VBUFF_X_MAX/16
 #define VBUFF_Y_LINE		VBUFF_Y_MAX/16

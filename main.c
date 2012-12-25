@@ -35,6 +35,17 @@ int main(void) {
 
 	//dmdp10_Init();
 	dmdp08_Init();
+	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
+		GL_DrawNumber(&Font[0], 0, 0,1234,1);
+		GL_DrawNumber(&Font[0], 32, 0,9966,1);
+		GL_DrawNumber(&Font[0], 0, 9,5678,1);
+
+	while (1) {
+
+		dmdp08_Scan();
+		_delay_ms(1);
+	}
+
 
 	sei();
 

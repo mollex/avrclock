@@ -14,6 +14,8 @@
 #define	DDR_MOSI1	_SFR_IO_ADDR(DDRB), 3
 #define	PORT_MOSI1	_SFR_IO_ADDR(PORTB), 3
 
+#define	DDR_MOSI2	_SFR_IO_ADDR(DDRB), 4
+#define	PORT_MOSI2	_SFR_IO_ADDR(PORTB), 4
 
 ;---------------------------------------------------------------------------;
 .nolist
@@ -23,19 +25,32 @@
 
 
 ;---------------------------------------------------------------------------;
-; Initialize MMC port
+; Initialize dmd soft spi1
 ;
 ; void xinit_spi1 (void);
 
 .global xinit_spi1
 .func xinit_spi1
 xinit_spi1:
-	sbi	DDR_MOSI1	; DI: output
+	sbi	DDR_MOSI1	; MOSI1 output
+	cbi	PORT_MOSI1
 	sbi	DDR_CK1		; SCLK: output
 	ret
 .endfunc
 
+;---------------------------------------------------------------------------;
+; Initialize dmd soft spi2
+;
+; void xinit_spi2 (void);
 
+.global xinit_spi2
+.func xinit_spi2
+xinit_spi2:
+	sbi	DDR_MOSI2	; MOSI2 output
+	sbi	PORT_MOSI2
+	sbi	DDR_CK1		; SCLK: output
+	ret
+.endfunc
 ;---------------------------------------------------------------------------;
 ; Transmit a byte
 ;
