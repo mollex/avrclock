@@ -26,6 +26,7 @@ extern void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, 
 extern VideoBuf_t	VideoBuf;
 extern Font_t Font[];
 int val = 0;
+int val2 = 0;
 int main(void) {
 	uart_init();
 
@@ -40,10 +41,20 @@ int main(void) {
 		GL_DrawNumber(&Font[0], 32, 0,9966,1);
 		GL_DrawNumber(&Font[0], 0, 9,5678,1);
 
+		GL_DrawNumber(&Font[0], 0, 16,2222,1);
+		GL_DrawNumber(&Font[0], 32, 24,1111,1);
+
 	while (1) {
 
 		dmdp08_Scan();
+
 		_delay_ms(1);
+
+		if(val++ > 300)
+		{
+			val = 0;
+			GL_DrawNumber(&Font[0], 0, 0,val2++,1);
+		}
 	}
 
 

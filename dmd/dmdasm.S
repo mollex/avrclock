@@ -93,4 +93,36 @@ xhigh_spi1:
 	ret
 .endfunc
 
+;---------------------------------------------------------------------------;
+; Transmit a short
+;
+; void xshort_spi1 (short);
 
+.global xshort_spi1
+.func xshort_spi1
+xshort_spi1:
+	ldi	r26, 8
+
+11:	sbrc	r24, 0		; DI = Bit to sent
+	cbi	PORT_MOSI1		;
+	sbrs	r24, 0		;
+	sbi	PORT_MOSI1		; /
+	sbi	PORT_CK1		; A positive pulse to SCLK
+	lsr	r24				; Get DO from MMC
+	cbi	PORT_CK1		; /
+	dec	r26				; Repeat 8 times
+	brne	11b			; /
+
+	ldi	r26, 8
+12:	sbrc	r25, 0		; DI = Bit to sent
+	cbi	PORT_MOSI1		;
+	sbrs	r25, 0		;
+	sbi	PORT_MOSI1		; /
+	sbi	PORT_CK1		; A positive pulse to SCLK
+	lsr	r25				; Get DO from MMC
+	cbi	PORT_CK1		; /
+	dec	r26				; Repeat 8 times
+	brne	12b			; /
+
+	ret
+.endfunc

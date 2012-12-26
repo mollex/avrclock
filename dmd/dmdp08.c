@@ -101,6 +101,7 @@ LED Panel Layout in RAM
 void xinit_spi1(void);		/* Initialize SPI port */
 void xlow_spi1(uint16_t d);		/* Send a byte  */
 void xhigh_spi1(uint16_t d);	/* Send a byte  */
+void xshort_spi1(uint16_t d);
 
 void xinit_spi2(void);		/* Initialize SPI port */
 
@@ -131,14 +132,16 @@ ISR (TIMER0_OVF_vect)
 void dmdp08_Scan()
 {
 	static uint8_t chnl = 0;
-
+	uint8_t val;
 	if(chnl>15) chnl = 0;
 
 	for (int i=0;i<4;i++) {
-		xlow_spi1(VideoBuf.vbuff[0][i][chnl]);
-		xhigh_spi1(VideoBuf.vbuff[0][i][chnl]);
-		//xlow_spi1(VideoBuf.vbuff[0][1][chnl]);
-		//xhigh_spi1(VideoBuf.vbuff[0][1][chnl]);
+
+		//val =  (VideoBuf.vbuff[1][i][chnl]<<8)| (VideoBuf.vbuff[0][i][chnl] & 0xFF);
+		xshort_spi1(VideoBuf.vbuff[0][i][chnl]);
+		//val =  (VideoBuf.vbuff[1][i][chnl] & 0xFF00)| (VideoBuf.vbuff[0][i][chnl] >> 8);
+		//xshort_spi1(val);
+
 	}
 
     //_mDMD_OE_ON();
