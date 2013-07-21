@@ -85,7 +85,6 @@ LED Panel Layout in RAM
 	#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-
 //DMD I/O pin macros
 #define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORTD, 7 ); cbi( PORTD, 6 ); }
 #define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORTD, 7 ); sbi( PORTD, 6 ); }
@@ -101,24 +100,36 @@ LED Panel Layout in RAM
 /************************** Function Prototypes ******************************/
 extern void spi_init();
 extern char spi_transfer(char b);
+void dmdp10_Scan();
 
 extern VideoBuf_t	VideoBuf;
-
 /**<
  * **************************************************************************
- * @brief	Function scan led module
+ * @brief	Timer Intr for scan every 4.096 ms
+ *					scan time 50 us - cpu 16Mhz  spi 8Mhz  32x16 pixels
+ *					scan time 80 us - cpu 16Mhz  spi 8Mhz  64x16 pixels
+ *					scan time 160 us -cpu 16Mhz  spi 8Mhz  64x32 pixels
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+ISR (TIMER0_OVF_vect)
+{
+	 dmdp10_Scan();
+}
+/**<
+ * **************************************************************************
+ * @brief	Scan for 1 module
+ *
+ *		_____________
+ *		|			|
+ *	   -|	 M1		|-
+ *		|___________|
  *
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-
-
-void dmdp10_Scan()
+inline void dmdp10_scanSingleModule(char chnl)
 {
-	static uint8_t chnl = 0;
-
-	if(chnl>3) chnl = 0;
-
 	for (int i=0;i<2;i++) {
 
 		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
@@ -132,6 +143,84 @@ void dmdp10_Scan()
 		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);
 
     }
+}
+/**<
+ * **************************************************************************
+ * @brief	Scan for 1 module
+ *
+ *		_____________			_____________
+ *		|			|			|			|
+ *	   -|	 M1		|-----------|	 M2		|-
+ *		|___________|			|___________|
+ *
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+inline void dmdp10_scanDoubleModule(char chnl)
+{
+	for (int i=0;i<4;i++) {
+
+		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
+		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]);
+		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]);
+		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]);
+
+		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]>>8);
+		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]>>8);
+		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]>>8);
+		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);
+    }
+}
+/**<
+ * **************************************************************************
+ * @brief	Scan for 1 module
+ *
+ *		_____________			_____________
+ *		|			|			|			|
+ *	   -|	 M1		|-----------|	 M2		|----
+ *		|___________|			|___________|	|
+ *												|
+ *	  ------------------------------------------
+ * 	 |	_____________			_____________
+ *	 |	|			|			|			|
+ *	 | -|	 M3		|-----------|	 M4		|-
+ *		|___________|			|___________|
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+inline void dmdp10_scanQadroModule(char chnl)
+{
+	int j = 1;
+	do
+	{
+		for (int i=0;i<4;i++) {
+
+			spi_transfer(~VideoBuf.vbuff[j][i][12 + chnl]);
+			spi_transfer(~VideoBuf.vbuff[j][i][8 + chnl]);
+			spi_transfer(~VideoBuf.vbuff[j][i][4 + chnl]);
+			spi_transfer(~VideoBuf.vbuff[j][i][0 + chnl]);
+
+			spi_transfer(~VideoBuf.vbuff[j][i][12 + chnl]>>8);
+			spi_transfer(~VideoBuf.vbuff[j][i][8 + chnl]>>8);
+			spi_transfer(~VideoBuf.vbuff[j][i][4 + chnl]>>8);
+			spi_transfer(~VideoBuf.vbuff[j][i][0 + chnl]>>8);
+		}
+	}while(j--);
+}
+/**<
+ * **************************************************************************
+ * @brief	Function scan led module
+ *
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+void dmdp10_Scan()
+{
+	static uint8_t chnl = 0;
+
+	if(chnl>3) chnl = 0;
+
+	dmdp10_scanQadroModule(chnl);
 
 	OE_DMD_ROWS_OFF();
 	LATCH_DMD_SHIFT_REG_TO_OUTPUT();
@@ -155,9 +244,6 @@ void dmdp10_Scan()
 
 	chnl++;
 }
-
-
-
 /**<
  * **************************************************************************
  * @brief	Function initializing peripherals
@@ -174,4 +260,7 @@ void dmdp10_Init()
 	PORTD= 0x00;
 
 	spi_init();
+
+	TCCR0B = 1<<CS02;			//divide by 256
+	TIMSK0 = 1<<TOIE0;			//enable timer interrupt
 }
