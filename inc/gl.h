@@ -28,7 +28,7 @@
 #define VBUFF_X_MAX		64
 #define VBUFF_Y_MAX		32
 
-#define VBUFF_X_LINE		VBUFF_X_MAX/16
+#define VBUFF_X_LINE		VBUFF_X_MAX/8
 #define VBUFF_Y_LINE		VBUFF_Y_MAX/16
 
 /**************************** Type Definitions ******************************/
@@ -38,7 +38,7 @@ typedef struct
 	uint16_t		ymax;
 	uint16_t		xline;
 	uint16_t		yline;
-	uint16_t		vbuff[VBUFF_Y_LINE][VBUFF_X_LINE][16];
+	uint8_t			vbuff[VBUFF_Y_LINE][VBUFF_X_LINE][16];
 
 }VideoBuf_t;
 

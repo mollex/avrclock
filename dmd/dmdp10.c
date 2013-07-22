@@ -128,22 +128,16 @@ ISR (TIMER0_OVF_vect)
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-inline void dmdp10_scanSingleModule(char chnl)
+/*inline void dmdp10_scanSingleModule(char chnl)
 {
-	for (int i=0;i<2;i++) {
+	for (int i=0;i<4;i++) {
 
 		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]);
-
-		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);
-
     }
-}
+}*/
 /**<
  * **************************************************************************
  * @brief	Scan for 1 module
@@ -156,21 +150,17 @@ inline void dmdp10_scanSingleModule(char chnl)
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-inline void dmdp10_scanDoubleModule(char chnl)
+/*inline void dmdp10_scanDoubleModule(char chnl)
 {
-	for (int i=0;i<4;i++) {
+	for (int i=0;i<8;i++) {
 
 		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]);
 		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]);
 
-		spi_transfer(~VideoBuf.vbuff[0][i][12 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][8 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][4 + chnl]>>8);
-		spi_transfer(~VideoBuf.vbuff[0][i][0 + chnl]>>8);
     }
-}
+}*/
 /**<
  * **************************************************************************
  * @brief	Scan for 1 module
@@ -193,17 +183,12 @@ inline void dmdp10_scanQadroModule(char chnl)
 	int j = 1;
 	do
 	{
-		for (int i=0;i<4;i++) {
+		for (int i=0;i<8;i++) {
 
 			spi_transfer(~VideoBuf.vbuff[j][i][12 + chnl]);
 			spi_transfer(~VideoBuf.vbuff[j][i][8 + chnl]);
 			spi_transfer(~VideoBuf.vbuff[j][i][4 + chnl]);
 			spi_transfer(~VideoBuf.vbuff[j][i][0 + chnl]);
-
-			spi_transfer(~VideoBuf.vbuff[j][i][12 + chnl]>>8);
-			spi_transfer(~VideoBuf.vbuff[j][i][8 + chnl]>>8);
-			spi_transfer(~VideoBuf.vbuff[j][i][4 + chnl]>>8);
-			spi_transfer(~VideoBuf.vbuff[j][i][0 + chnl]>>8);
 		}
 	}while(j--);
 }

@@ -39,15 +39,22 @@ int main(void) {
 
 		sei();
 
+
+		/*GL_DrawChar(&Font[0], 0, 0, '0', 0);
+		GL_DrawChar(&Font[0], 8, 0, '1', 0);
+
+		GL_DrawChar(&Font[1], 16, 0, '1', 0);
+		GL_DrawChar(&Font[1], 40, 0, '1', 0);*/
+
 	while (1) {
 
 
-		_delay_ms(1000);
+		_delay_ms(100);
 
 			val = 0;
-			GL_DrawNumber(&Font[0], 8, 12,val2++,1);
-			GL_DrawNumber(&Font[0], 0, 0,2222,1);
-			GL_DrawNumber(&Font[0], 32, 5,3333,1);
+			GL_DrawNumber(&Font[1], 0, 0,val2++,1);
+			//GL_DrawNumber(&Font[0], 0, 0,2222,1);
+			//GL_DrawNumber(&Font[0], 32, 5,3333,1);
 	}
 
 
