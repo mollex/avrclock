@@ -49,6 +49,9 @@ extern  unsigned char courierNew_8ptBitmaps[];
 extern  FontChar_t calibri_24ptDescriptors[];
 extern  unsigned char calibri_24ptBitmaps[];
 
+extern  FontChar_t segmental_28ptDescriptors[];
+extern  unsigned char segmental_28ptBitmaps[];
+
 int _Color = 1;
 // Font information for Courier New 8pt
 Font_t Font[] =
@@ -71,6 +74,15 @@ Font_t Font[] =
 		.charInfo = calibri_24ptDescriptors, //  Character descriptor array
 		.dataPtr = calibri_24ptBitmaps, //  Character bitmap array
 	},
+	{
+		.heightPages = 2, //  Character height
+		.pt = 52,
+		.startChar = '0', //  Start character
+		.endChar = '9', //  End character
+		.spacePixels = 2, //  Width, in pixels, of space character
+		.charInfo = segmental_28ptDescriptors, //  Character descriptor array
+		.dataPtr = segmental_28ptBitmaps, //  Character bitmap array
+	},
 
 };
 
@@ -84,6 +96,15 @@ VideoBuf_t	VideoBuf = {
 	
 };
 /************************* Function Prototypes *****************************/
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 static void gl_uart()
 {
 	int xl, yl;
@@ -102,7 +123,15 @@ static void gl_uart()
 	
 	memset(VideoBuf.vbuff, 0, sizeof(VideoBuf.vbuff));
 }
-
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
 {
 	if(x > VideoBuf.xmax || y > VideoBuf.ymax)	return;
@@ -118,7 +147,15 @@ void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
 		VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
 	}
 }
-
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch, uint8_t colour)
 {
 	uint8_t i, j;
@@ -137,7 +174,15 @@ int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch, uint8_t col
 
 	return (i + font->spacePixels);
 }
-
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour)
 {
 	uint8_t buffer[8] = {0};

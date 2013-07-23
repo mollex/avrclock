@@ -26,6 +26,7 @@
 
 /***************************** Include Files *******************************/
 #include <stdint.h>
+#include <avr/pgmspace.h>
 /************************** Constant Definitions ****************************/
 
 
