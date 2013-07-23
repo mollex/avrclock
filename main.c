@@ -49,10 +49,13 @@ int main(void) {
 	while (1) {
 
 
-		_delay_ms(100);
+		_delay_ms(50);
 
-			val = 0;
-			GL_DrawNumber(&Font[1], 0, 0,val2++,1);
+			//val = 0;
+			GLClock_SetHour(&Font[2], val++);
+			GLClock_SetMinutes(&Font[2], 0);
+			GLClock_SetDots(val & 0x1);
+			//GL_DrawNumber(&Font[2], 1, 2,val2++,1);
 			//GL_DrawNumber(&Font[0], 0, 0,2222,1);
 			//GL_DrawNumber(&Font[0], 32, 5,3333,1);
 	}

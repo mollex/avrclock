@@ -156,7 +156,7 @@ void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
  * @return None.
  *
  *****************************************************************************/
-int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch, uint8_t colour)
+int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
 {
 	uint8_t i, j;
 
@@ -186,13 +186,55 @@ int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch, uint8_t col
 void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour)
 {
 	uint8_t buffer[8] = {0};
-	sprintf(buffer, "%05d", (int)(num & 0x1FFFF));
+	sprintf(buffer, "%04d", (int)(num & 0x1FFFF));
 
 	uint8_t t, i=0;
 	do{
 		t = buffer[i++];
 		//printf("off %d\n\r",x0);
-		x0 += GL_DrawChar(font, x0, y0, t, colour);
+		x0 += GL_DrawChar(font, x0, y0, t);
 	}
 	while(t);
+}
+
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
+void GLClock_SetHour(Font_t *font, char val)
+{
+	char hight = val/10 + '0';
+	char low = val%10 + '0';
+
+	GL_DrawChar(font, 0, 3, hight);
+	GL_DrawChar(font, 16, 3, low);
+
+}
+
+void GLClock_SetMinutes(Font_t *font, char val)
+{
+	char hight = val/10 + '0';
+	char low = val%10 + '0';
+
+	GL_DrawChar(font, 34, 3, hight);
+	GL_DrawChar(font, 50, 3, low);
+}
+
+void GLClock_SetDots(char val)
+{
+	gl_setpixel(31, 8,  val);
+	gl_setpixel(31, 9,  val);
+	gl_setpixel(31, 10,  val);
+	gl_setpixel(32, 10,  val);
+	gl_setpixel(32, 8,  val);
+	gl_setpixel(32, 9,  val);
+}
+void GLClock_SetTemp(Font_t *font, char val)
+{
+
 }
