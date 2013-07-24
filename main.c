@@ -27,12 +27,18 @@ extern VideoBuf_t	VideoBuf;
 extern Font_t Font[];
 int val = 0;
 int val2 = 0;
+
+extern void tx_print(char *s);
+extern void tx_hexprint(char *s, char len);
+
+
 int main(void) {
 	uart_init();
+	DDRC  |= (1<<0);
 
 
-
-	printf("begin\\n\r");
+	printf("begin 1 \n\r");
+	tx_print("begin 2 \n\r");
 
 	dmdp10_Init();
 	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
@@ -47,9 +53,9 @@ int main(void) {
 		GL_DrawChar(&Font[1], 40, 0, '1', 0);*/
 
 	while (1) {
+		tx_print("begin 2 \n\r");
 
-
-		_delay_ms(50);
+		_delay_ms(500);
 
 			//val = 0;
 			GLClock_SetHour(&Font[2], val++);
