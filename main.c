@@ -41,6 +41,7 @@ int main(void) {
 	tx_print("begin 2 \n\r");
 
 	dmdp10_Init();
+	ds1307_init();
 	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
 
 		sei();
@@ -55,7 +56,9 @@ int main(void) {
 	while (1) {
 		tx_print("begin 2 \n\r");
 
-		_delay_ms(500);
+		_delay_ms(3000);
+
+		ds1307_startstop(1);
 
 			//val = 0;
 			GLClock_SetHour(&Font[2], val++);
