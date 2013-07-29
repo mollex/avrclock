@@ -14,6 +14,7 @@
 
 #include "gl.h"
 #include "font.h"
+#include "d_1-wire.h"
 
 extern void uart_init();
 extern void GL_Test();
@@ -34,7 +35,7 @@ extern void tx_hexprint(char *s, char len);
 
 int main(void) {
 	uart_init();
-	DDRC  |= (1<<0);
+
 
 
 	printf("begin 1 \n\r");
@@ -54,11 +55,15 @@ int main(void) {
 		GL_DrawChar(&Font[1], 40, 0, '1', 0);*/
 
 	while (1) {
+
 		tx_print("begin 2 \n\r");
 
 		_delay_ms(3000);
 
-		ds1307_startstop(1);
+		//ds1307_startstop(1);
+
+		//ds18b20_SelfTest();
+		ds18b20_ReadTemp();
 
 			//val = 0;
 			GLClock_SetHour(&Font[2], val++);

@@ -25,9 +25,9 @@
 /************** Macros 1-WIRE INTERFACE **************************************/
 
 // Port configuration registers for 1-Wire buses.
-#define     OWI_PORT        PORTD   //!< 1-Wire PORT Data register.
-#define     OWI_PIN         PIND    //!< 1-Wire Input pin register.
-#define     OWI_DDR         DDRD    //!< 1-Wire Data direction register.
+#define     OWI_PORT        PORTC   //!< 1-Wire PORT Data register.
+#define     OWI_PIN         PINC    //!< 1-Wire Input pin register.
+#define     OWI_DDR         DDRC    //!< 1-Wire Data direction register.
 // Pin bitmasks.
 #define     OWI_PIN_0       0x01
 #define     OWI_PIN_1       0x02
@@ -37,7 +37,7 @@
 #define     OWI_PIN_5       0x20
 #define     OWI_PIN_6       0x40
 #define     OWI_PIN_7       0x80
-#define     BUSES           OWI_PIN_0
+#define 	DS18B20_PIN   	OWI_PIN_0
 // Timing parameters
 #define     CPU_FREQUENCY    CPU_CLOCK 
 #define     OWI_DELAY_OFFSET_CYCLES    13   //!< Timing delay when pulling bus low and releasing bus.
@@ -77,8 +77,10 @@
 /************** Macros DS18B20  DEFINES **************************************/
 #define ds18b20_rev					3
 
-// family code
-#define DS18B20_FAMILY				0x10
+/* DS18X20 specific values (see datasheet) */
+#define DS18S20_FAMILY_CODE       0x10
+#define DS18B20_FAMILY_CODE       0x28
+#define DS1822_FAMILY_CODE        0x22
 
 // function commands
 #define DS18B20_CONVERT_TEMP		0x44
@@ -143,14 +145,11 @@ Dallas_rom_id_t     Dallas_rom_id;
 
 //-----------------------------------------------------------------------------
 //  initializes the dallas 1-wire bus
-    unsigned char ds18b20Init(unsigned char pins);
+//  unsigned char ds18b20Init(unsigned char pins);
 //  Start the conversion for the given device
-    void ds18b20Start(unsigned char pins);
+//  void ds18b20Start(unsigned char pins);
 //-----------------------------------------------------------------------------
     void ds18b20_SelfTest();
-	void ds18b20_StartConvertTemp(unsigned char pin);
 	void ds18b20_ReadTemp();
-	void ds18b20_ConsolePrint(unsigned char pin);
 //-----------------------------------------------------------------------------
-//void main_OWI();
 #endif

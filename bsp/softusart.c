@@ -41,7 +41,8 @@
 
 #define bvalue 135	//61
 #define SWUART_PORT PORTC	//TX Port
-#define SWUART_PIN	0		//TX Pin
+#define SWUART_DDR  DDRC	//TX Port
+#define SWUART_PIN	3		//TX Pin
 
 /*
 b-values for 16 MHz
@@ -84,7 +85,7 @@ void txd (char value)
 {
    uint8_t bitcnt = 1+8+STOP_BITS;
    uint8_t delay = bvalue;	//see softuart.h
-
+   SWUART_DDR  |= (1<<SWUART_PIN);
    value = ~value;
 
    cli();

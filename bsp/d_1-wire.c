@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdio.h>
+
 #include "d_1-wire.h"
 #include <avr/interrupt.h>
 #include <avr/delay.h>
@@ -5,7 +8,7 @@
 #define __disable_interrupt()   asm("cli")
 #define __enable_interrupt()   	asm("sei")
 
-#define DS18B20_PIN   	OWI_PIN_4
+
 /*****************************************************************************
 *
 *    Переменные глобальные
@@ -271,6 +274,8 @@ extern void tx_hexprint(char *s, char len);
 		dallas_crc = dallas_crc_table[dallas_crc^i];
 		return dallas_crc;
 	}
+
+
 /****************************************************************************
 *
 *
@@ -279,135 +284,105 @@ extern void tx_hexprint(char *s, char len);
 *
 *****************************************************************************/
 
-	/*****************************************************************************
-	*	Функция --> ds18b20
-	*	This function initializes the 1-Wire bus(es) by releasing it and
-	*	waiting until any presence sinals are finished.
-	******************************************************************************/
-	unsigned char ds18b20Init(unsigned char pins)
-	{
-		OWI_Init(pins);
-		return (OWI_DetectPresence(pins));
-	}
-	/*****************************************************************************
-	*	Функция --> ds18b20
-	*	Start the conversion for the given device
-	******************************************************************************/
-	void ds18b20Start(unsigned char pins)
-	{
-		OWI_SkipRom(pins);
-		OWI_SendByte(DS18B20_CONVERT_TEMP, pins);
-	//	return DALLAS_NO_ERROR;
-	}
+/*****************************************************************************
+*	Функция --> ds18b20
+*	This function initializes the 1-Wire bus(es) by releasing it and
+*	waiting until any presence sinals are finished.
+******************************************************************************/
+unsigned char ds18b20Init(unsigned char pins)
+{
+	OWI_Init(pins);
+	return (OWI_DetectPresence(pins));
+}
+/*****************************************************************************
+*	Функция --> ds18b20
+*	Start the conversion for the given device
+******************************************************************************/
+/*void ds18b20Start(unsigned char pins)
+{
+	OWI_SkipRom(pins);
+	OWI_SendByte(DS18B20_CONVERT_TEMP, pins);
+}*/
+/*****************************************************************************
+*   Функция --> Telemetry - ds18b20
+*   Подает команду датчику начать измерение температуры
+******************************************************************************/
+/*void ds18b20_StartConvertTemp(unsigned char pin)
+{
+	OWI_DetectPresence(pin);
+	OWI_SendByte(OWI_ROM_SKIP, pin);
+	OWI_SendByte(DS18B20_CONVERT_TEMP, pin);
+}*/
+/*****************************************************************************
+*	Функция --> Telemetry - ds18b20
+*	Функция производит инициализацию заданных датчиков температуры
+*	Вычитывает и передает на консоль индификатор каждого датчика
+******************************************************************************/
+void ds18b20_SelfTest()
+{
+	int j;
+	Dallas_rom_id.find = 0;
 
-	//----------------------------------------------------------------------------
-	//
-	//    Проект "Лазерный дальномер"
-	//    Функции для работы с 8 датчиками температуры
-	//    Считывание производится параллельно
-	//
-	//
-	//----------------------------------------------------------------------------
-
-
-	/*****************************************************************************
-	*   Функция --> Telemetry - ds18b20
-	*   Подает команду датчику начать измерение температуры
-	******************************************************************************/
-	void ds18b20_StartConvertTemp(unsigned char pin)
+	if(ds18b20Init(DS18B20_PIN))
 	{
-		OWI_DetectPresence(pin);
-		OWI_SendByte(OWI_ROM_SKIP, pin);
-		OWI_SendByte(DS18B20_CONVERT_TEMP, pin);
-	}
-	/*****************************************************************************
-	*   Функция --> Telemetry - ds18b20
-	*   Вычитывание телеметрии с 8 датчиков с сохранением в указаном буфере
-	******************************************************************************/
-/*	void ds18b20_ReadTemp(unsigned char pin, unsigned char * dataBuff)
-	{
-		OWI_DetectPresence(pin);
-		OWI_SendByte(OWI_ROM_SKIP, pin);
-		OWI_SendByte(DS18B20_READ_SCRATCHPAD, pin);
-		//OWI_Parallel_ReceiveByte(pin, dataBuff);
-		//OWI_Parallel_ReceiveByte(pin, dataBuff+1);
-	}*/
-	/*****************************************************************************
-	*	Функция --> Telemetry - ds18b20
-	*	Функция производит инициализацию заданных датчиков температуры
-	*	Вычитывает и передает на консоль индификатор каждого датчика
-	******************************************************************************/
-	void ds18b20_SelfTest()
-	{
-		char j;
-		tx_print("TEST: Sensor ");
-		Dallas_rom_id.find = 0;
-
-		if(ds18b20Init(DS18B20_PIN))
+		OWI_ReadRom(&Dallas_rom_id.byte[0], DS18B20_PIN);  //Читаем РОМ Индификатор
+		dallas_crc = 0;
+		for(j=0; j<8; j++){	OWI_dallasCRC(Dallas_rom_id.byte[j]);}//Высчитываем CRC
+		if(dallas_crc)								//Если 0 то сумма корректна
 		{
-			OWI_ReadRom(&Dallas_rom_id.byte[0], DS18B20_PIN);  //Читаем РОМ Индификатор
-			dallas_crc = 0;
-			for(j=0; j<8; j++){	OWI_dallasCRC(Dallas_rom_id.byte[j]);}//Высчитываем CRC
-			if(dallas_crc)								//Если 0 то сумма корректна
-			{
-				tx_print("Crc Err \n\r");
-			}else
-			{
-				Dallas_rom_id.find = 1;
-				tx_print("Id Rom: ");
-				tx_hexprint(Dallas_rom_id.byte, 8);
-				tx_print(" \n\r");
-			}
+			printf("Crc Err \n\r");
 		}else
 		{
-			tx_print("Not found \n\r");
+			Dallas_rom_id.find = 1;
+			printf("\n\r Id Rom: ");
+			for(j=0; j<8; j++){	printf(" 0x%x", Dallas_rom_id.byte[j]);}
 		}
+	}else
+	{
+		printf("Not found \n\r");
 	}
-
+}
 /*****************************************************************************
 *	Функция --> Telemetry - ds18b20
 *	Функция получения и выдача температуры по запросу пользователя
 ******************************************************************************/
-	void ds18b20_ReadTemp()
+void ds18b20_ReadTemp()
+{
+	char	 tempBuff[2];
+
+	if(Dallas_rom_id.find == 1)
 	{
-		char	 tempBuff[2];
 
-		if(Dallas_rom_id.find == 1)
-		{
+		OWI_DetectPresence(DS18B20_PIN);
+		OWI_SendByte(OWI_ROM_SKIP, DS18B20_PIN);
+		OWI_SendByte(DS18B20_CONVERT_TEMP, DS18B20_PIN);
+		_delay_ms(900);
 
-			tx_print("\tTemp: ");
-			OWI_DetectPresence(DS18B20_PIN);
-			OWI_SendByte(OWI_ROM_SKIP, DS18B20_PIN);
-			OWI_SendByte(DS18B20_CONVERT_TEMP, DS18B20_PIN);
-			_delay_ms(900);
+		OWI_DetectPresence(DS18B20_PIN);
+		OWI_SendByte(OWI_ROM_SKIP, DS18B20_PIN);
+		OWI_SendByte(DS18B20_READ_SCRATCHPAD, DS18B20_PIN);
+		tempBuff[1] = OWI_ReceiveByte(DS18B20_PIN);
+		tempBuff[0] = OWI_ReceiveByte(DS18B20_PIN);
 
-			OWI_DetectPresence(DS18B20_PIN);
-			OWI_SendByte(OWI_ROM_SKIP, DS18B20_PIN);
-			OWI_SendByte(DS18B20_READ_SCRATCHPAD, DS18B20_PIN);
-			tempBuff[1] = OWI_ReceiveByte(DS18B20_PIN);
-			tempBuff[0] = OWI_ReceiveByte(DS18B20_PIN);
+		//tx_hexprint(tempBuff, 2);
 
-			//tx_hexprint(tempBuff, 2);
+	/*	if((tempBuff[0] == 0xFF) && (tempBuff[1] == 0xFF)) {tx_print(" Not found\n\r"); return;}
 
-		/*	if((tempBuff[0] == 0xFF) && (tempBuff[1] == 0xFF)) {tx_print(" Not found\n\r"); return;}
+		temp = (tempBuff[0]<<4) | (tempBuff[1]>>4);
+		txd (0x30 + temp/100);
+		txd (0x30 + (temp%100)/10);
+		txd (0x30 + temp%10);
+		if((tempBuff[1] & 0x0F)==0x08) tx_print(".5"); else tx_print(".0");*/
 
-			temp = (tempBuff[0]<<4) | (tempBuff[1]>>4);
-			txd (0x30 + temp/100);
-			txd (0x30 + (temp%100)/10);
-			txd (0x30 + temp%10);
-			if((tempBuff[1] & 0x0F)==0x08) tx_print(".5"); else tx_print(".0");*/
-
-			Dallas_rom_id.temperature = (tempBuff[1]>>1);
-			txd (0x30 + Dallas_rom_id.temperature/100);
-			txd (0x30 + (Dallas_rom_id.temperature%100)/10);
-			txd (0x30 + Dallas_rom_id.temperature%10);
-			if((tempBuff[1] & 0x01)) tx_print(".5"); else tx_print(".0");
-			tx_print(" *C\n\r");
-
-		}
-
-
+		Dallas_rom_id.temperature = (tempBuff[1]>>1);
+		printf("\n\r Temp: %d", Dallas_rom_id.temperature);
+		//txd (0x30 + Dallas_rom_id.temperature/100);
+	//	txd (0x30 + (Dallas_rom_id.temperature%100)/10);
+	//	txd (0x30 + Dallas_rom_id.temperature%10);
+	//	if((tempBuff[1] & 0x01)) tx_print(".5"); else tx_print(".0");
+	//	tx_print(" *C\n\r");
+	}else
+	{
+		ds18b20_SelfTest();
 	}
-
-
-
+}
