@@ -272,3 +272,36 @@ unsigned char dallas_crc_table[] =		// dallas crc lookup table
 		dallas_crc = dallas_crc_table[dallas_crc^i];
 		return dallas_crc;
 	}
+	/*****************************************************************************
+		‘ункци€ --> 1-WIRE PROTOCOL
+		–асчет контрольной суммы
+	******************************************************************************/
+	inline unsigned char OWI_dallasCRCBuff(unsigned char *ptr, int size)
+	{
+		int i;
+		dallas_crc = 0;
+		for(i=0; i<size; i++){	OWI_dallasCRC(*ptr++);}
+		return dallas_crc;
+	}
+
+
+
+	/*
+	 * //прочитать 8 байт и вычислить CRC
+  for( i=0; i<8; i++)
+  {
+    data = ds_read_byte(1<<PinNumb);         //прочитать очередной байт
+    buff[i] = data;                          //сохранить его в массиве
+
+    //вычисление CRC - обрабатываем каждый бит прин€того байта
+    for( j=0; j<8; j++)
+    {
+      tmp = (crc ^ data) & 0x01;
+      if (tmp==0x01) crc = crc ^ 0x18;
+      crc = (crc >> 1) & 0x7F;
+      if (tmp==0x01) crc = crc | 0x80;
+      data = data >> 1;
+    }
+  }
+  */
+	 */

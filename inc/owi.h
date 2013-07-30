@@ -119,5 +119,6 @@
 	void OWI_ReadRom(unsigned char * romValue, unsigned char pin);
 //  ¬ыбор адреса - используетс€ дл€ обращени€ к конкретному адресу устройства из многих подключенных
 	void OWI_MatchRom(unsigned char * romValue, unsigned char pins);
+	unsigned char OWI_dallasCRCBuff(unsigned char *ptr, int size);
 
 #endif /* GL_H_ */

@@ -38,8 +38,8 @@
 		unsigned char type;
 		unsigned char tempH;
 		unsigned char tempL;
-		unsigned char tempP;
-		unsigned char byte[8];
+		unsigned char tempS;
+		unsigned char byte[9];
 	} Dallas_rom_id_t;
 
 	Dallas_rom_id_t     Dallas_rom_id;
@@ -51,6 +51,25 @@ extern unsigned char dallas_crc;				// current crc global variable
 
 extern void tx_print(char *s);
 extern void tx_hexprint(char *s, char len);
+/**<
+ * **************************************************************************
+ * @brief	Function
+ *
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+unsigned char ds18x20_GetHight()
+{
+	return (Dallas_rom_id.tempH);
+}
+unsigned char ds18x20_GetLow()
+{
+	return (Dallas_rom_id.tempL);
+}
+unsigned char ds18x20_Sign()
+{
+	return (Dallas_rom_id.tempS);
+}
 /**<
  * **************************************************************************
  * @brief	Function initializing peripherals
@@ -78,9 +97,8 @@ void ds18x20_SelfTest()
 	if(ds18x20Init(DS18B20_PIN))
 	{
 		OWI_ReadRom(&Dallas_rom_id.byte[0], DS18B20_PIN);  //Читаем РОМ Индификатор
-		dallas_crc = 0;
-		for(j=0; j<8; j++){	OWI_dallasCRC(Dallas_rom_id.byte[j]);}//Высчитываем CRC
-		if(dallas_crc)								//Если 0 то сумма корректна
+
+		if(OWI_dallasCRCBuff(Dallas_rom_id.byte, 8))								//Если 0 то сумма корректна
 		{
 			printf("Crc Err \n\r");
 		}else
@@ -104,8 +122,7 @@ void ds18x20_SelfTest()
  ***************************************************************************/
 void ds18x20_ReadTemp()
 {
-	char	 tempBuff[2];
-
+	int i;
 	if(Dallas_rom_id.find == 1)
 	{
 		OWI_DetectPresence(DS18B20_PIN);
@@ -116,26 +133,53 @@ void ds18x20_ReadTemp()
 		OWI_DetectPresence(DS18B20_PIN);
 		OWI_SendByte(OWI_ROM_SKIP, DS18B20_PIN);
 		OWI_SendByte(DS18B20_READ_SCRATCHPAD, DS18B20_PIN);
-		tempBuff[1] = OWI_ReceiveByte(DS18B20_PIN);
-		tempBuff[0] = OWI_ReceiveByte(DS18B20_PIN);
 
-		if(Dallas_rom_id.type == DS18S20_FAMILY_CODE)
+		for ( i = 0; i < 9; i++) {           // we need to read 9 bytes
+			 Dallas_rom_id.byte[i] = OWI_ReceiveByte(DS18B20_PIN);
+		    }
+
+		if(OWI_dallasCRCBuff(Dallas_rom_id.byte, 9))
 		{
-
-
-		}else if(Dallas_rom_id.type == DS18B20_FAMILY_CODE)
-		{
-			Dallas_rom_id.tempH = (tempBuff[1]>>1);
-
-			printf("\n\r 18b20: %d", Dallas_rom_id.tempH);
-
-		}else if(Dallas_rom_id.type == DS1822_FAMILY_CODE)
-		{
-
+			printf("Crc Err \n\r");
 
 		}else
 		{
-			ds18x20_SelfTest();
+			Dallas_rom_id.byte[0] = 0xf8;
+			Dallas_rom_id.byte[1] = 0xff;
+
+			//printf("\n\r Temp: ");
+			//for(i=0; i<9; i++){	printf(" 0x%x", Dallas_rom_id.byte[i]);}
+
+			if(Dallas_rom_id.type == DS18S20_FAMILY_CODE)
+			{
+				Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
+				if(Dallas_rom_id.tempS)
+				{
+					Dallas_rom_id.byte[0] = ~Dallas_rom_id.byte[0];
+				}
+
+				Dallas_rom_id.tempH = (Dallas_rom_id.byte[0]>>1);
+				Dallas_rom_id.tempL = (Dallas_rom_id.byte[0] & 0x01) ? 5 : 0;
+
+			}else if(Dallas_rom_id.type == DS18B20_FAMILY_CODE)
+			{
+				Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
+				if(Dallas_rom_id.tempS)
+				{
+					Dallas_rom_id.byte[0] = ~Dallas_rom_id.byte[0];
+					Dallas_rom_id.byte[1] = ~Dallas_rom_id.byte[1];
+				}
+
+				Dallas_rom_id.tempH = Dallas_rom_id.byte[0]>>4 | Dallas_rom_id.byte[1]<<4;
+				Dallas_rom_id.tempL = ((Dallas_rom_id.byte[0] + 1) & 0x08) ? 5 : 0;
+
+			}else if(Dallas_rom_id.type == DS1822_FAMILY_CODE)
+			{
+
+			}else
+			{
+				ds18x20_SelfTest();
+			}
 		}
 
 	}else

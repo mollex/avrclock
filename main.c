@@ -34,11 +34,12 @@ extern void tx_hexprint(char *s, char len);
 
 extern void ds18x20_SelfTest();
 extern void ds18x20_SelfTest();
+extern unsigned char ds18x20_GetHight();
+extern unsigned char ds18x20_GetLow();
+extern unsigned char ds18x20_Sign();
 
 int main(void) {
 	uart_init();
-
-
 
 	printf("begin 1 \n\r");
 	tx_print("begin 2 \n\r");
@@ -60,12 +61,14 @@ int main(void) {
 
 		tx_print("begin 2 \n\r");
 
-		_delay_ms(3000);
+		_delay_ms(1000);
 
 		//ds1307_startstop(1);
 
 		//ds18b20_SelfTest();
 		ds18x20_ReadTemp();
+
+		printf("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
 
 			//val = 0;
 			GLClock_SetHour(&Font[2], val++);
