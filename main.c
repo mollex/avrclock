@@ -14,7 +14,7 @@
 
 #include "gl.h"
 #include "font.h"
-#include "d_1-wire.h"
+#include "owi.h"
 
 extern void uart_init();
 extern void GL_Test();
@@ -32,6 +32,8 @@ int val2 = 0;
 extern void tx_print(char *s);
 extern void tx_hexprint(char *s, char len);
 
+extern void ds18x20_SelfTest();
+extern void ds18x20_SelfTest();
 
 int main(void) {
 	uart_init();
@@ -63,7 +65,7 @@ int main(void) {
 		//ds1307_startstop(1);
 
 		//ds18b20_SelfTest();
-		ds18b20_ReadTemp();
+		ds18x20_ReadTemp();
 
 			//val = 0;
 			GLClock_SetHour(&Font[2], val++);
