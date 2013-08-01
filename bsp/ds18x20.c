@@ -46,7 +46,6 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-extern unsigned char dallas_crc;				// current crc global variable
 /************************** Function Prototypes ******************************/
 
 extern void tx_print(char *s);
@@ -144,37 +143,26 @@ void ds18x20_ReadTemp()
 
 		}else
 		{
-			Dallas_rom_id.byte[0] = 0xf8;
-			Dallas_rom_id.byte[1] = 0xff;
-
 			//printf("\n\r Temp: ");
 			//for(i=0; i<9; i++){	printf(" 0x%x", Dallas_rom_id.byte[i]);}
 
+			// minus sign
+			Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
+			if(Dallas_rom_id.tempS)
+			{
+				Dallas_rom_id.byte[0] = ~Dallas_rom_id.byte[0];
+				Dallas_rom_id.byte[1] = ~Dallas_rom_id.byte[1];
+			}
+
 			if(Dallas_rom_id.type == DS18S20_FAMILY_CODE)
 			{
-				Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
-				if(Dallas_rom_id.tempS)
-				{
-					Dallas_rom_id.byte[0] = ~Dallas_rom_id.byte[0];
-				}
-
 				Dallas_rom_id.tempH = (Dallas_rom_id.byte[0]>>1);
 				Dallas_rom_id.tempL = (Dallas_rom_id.byte[0] & 0x01) ? 5 : 0;
 
-			}else if(Dallas_rom_id.type == DS18B20_FAMILY_CODE)
+			}else if(Dallas_rom_id.type == DS18B20_FAMILY_CODE || Dallas_rom_id.type == DS1822_FAMILY_CODE)
 			{
-				Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
-				if(Dallas_rom_id.tempS)
-				{
-					Dallas_rom_id.byte[0] = ~Dallas_rom_id.byte[0];
-					Dallas_rom_id.byte[1] = ~Dallas_rom_id.byte[1];
-				}
-
 				Dallas_rom_id.tempH = Dallas_rom_id.byte[0]>>4 | Dallas_rom_id.byte[1]<<4;
 				Dallas_rom_id.tempL = ((Dallas_rom_id.byte[0] + 1) & 0x08) ? 5 : 0;
-
-			}else if(Dallas_rom_id.type == DS1822_FAMILY_CODE)
-			{
 
 			}else
 			{

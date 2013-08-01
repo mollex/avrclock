@@ -24,7 +24,6 @@ extern void dmdp10_Scan();
 
 extern void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour);
 
-extern VideoBuf_t	VideoBuf;
 extern Font_t Font[];
 int val = 0;
 int val2 = 0;
@@ -46,7 +45,7 @@ int main(void) {
 
 	dmdp10_Init();
 	ds1307_init();
-	memset(VideoBuf.vbuff, 0x0, sizeof(VideoBuf.vbuff));
+	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 
 		sei();
 
@@ -71,10 +70,10 @@ int main(void) {
 		printf("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
 
 			//val = 0;
-			GLClock_SetHour(&Font[2], val++);
-			GLClock_SetMinutes(&Font[2], 0);
+			GLClock_SetHour(&Font[1], val++);
+			GLClock_SetMinutes(&Font[1], 0);
 			GLClock_SetDots(val & 0x1);
-			//GL_DrawNumber(&Font[2], 1, 2,val2++,1);
+			//GL_DrawNumber(&Font[1], 1, 2,val2++,1);
 			//GL_DrawNumber(&Font[0], 0, 0,2222,1);
 			//GL_DrawNumber(&Font[0], 32, 5,3333,1);
 	}

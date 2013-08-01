@@ -39,7 +39,7 @@
 /************************** Function Prototypes *****************************/
 
 // Character bitmaps for Courier New 8pt
-unsigned char courierNew_8ptBitmaps[] = 
+unsigned char courierNew_8ptBitmaps[] PROGMEM  =
 {
 	// @0 '0' (5 pixels wide)
 	0x0E, //  ### 

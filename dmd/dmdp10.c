@@ -102,7 +102,7 @@ extern void spi_init();
 extern char spi_transfer(char b);
 void dmdp10_Scan();
 
-extern VideoBuf_t	VideoBuf;
+
 /**<
  * **************************************************************************
  * @brief	Timer Intr for scan every 4.096 ms
@@ -112,7 +112,7 @@ extern VideoBuf_t	VideoBuf;
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-ISR (TIMER0_OVF_vect)
+ISR (TIMER2_OVF_vect)
 {
 	 dmdp10_Scan();
 }
@@ -185,10 +185,10 @@ inline void dmdp10_scanQadroModule(char chnl)
 	{
 		for (int i=0;i<8;i++) {
 
-			spi_transfer(~VideoBuf.vbuff[j][i][12 + chnl]);
-			spi_transfer(~VideoBuf.vbuff[j][i][8 + chnl]);
-			spi_transfer(~VideoBuf.vbuff[j][i][4 + chnl]);
-			spi_transfer(~VideoBuf.vbuff[j][i][0 + chnl]);
+			spi_transfer(~_VideoBuf.vbuff[j][i][12 + chnl]);
+			spi_transfer(~_VideoBuf.vbuff[j][i][8 + chnl]);
+			spi_transfer(~_VideoBuf.vbuff[j][i][4 + chnl]);
+			spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);
 		}
 	}while(j--);
 }
@@ -246,6 +246,6 @@ void dmdp10_Init()
 
 	spi_init();
 
-	TCCR0B = 1<<CS02;			//divide by 256
-	TIMSK0 = 1<<TOIE0;			//enable timer interrupt
+	TCCR2B = 1<<CS02;			//divide by 256
+	TIMSK2 = 1<<TOIE0;			//enable timer interrupt
 }

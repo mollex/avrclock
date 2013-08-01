@@ -14,8 +14,8 @@
 *    ѕеременные глобальные
 *
 ******************************************************************************/
-unsigned char dallas_crc;				// current crc global variable
-unsigned char dallas_crc_table[] =		// dallas crc lookup table
+unsigned char  dallas_crc;
+/*unsigned char dallas_crc_table[]  =		// dallas crc lookup table
 {
 	0, 94,188,226, 97, 63,221,131,194,156,126, 32,163,253, 31, 65,
 	157,195, 33,127,252,162, 64, 30, 95, 1,227,189, 62, 96,130,220,
@@ -33,7 +33,7 @@ unsigned char dallas_crc_table[] =		// dallas crc lookup table
 	87, 9,235,181, 54,104,138,212,149,203, 41,119,244,170, 72, 22,
 	233,183, 85, 11,136,214, 52,106, 43,117,151,201, 74, 20,246,168,
 	116, 42,200,150, 21, 75,169,247,182,232, 10, 84,215,137,107, 53
-};
+};*/
 
 /****************************************************************************
 *
@@ -269,7 +269,7 @@ unsigned char dallas_crc_table[] =		// dallas crc lookup table
 	inline unsigned char OWI_dallasCRC(unsigned char i)
 	{
 		// update the crc global variable and return it
-		dallas_crc = dallas_crc_table[dallas_crc^i];
+		//dallas_crc = dallas_crc_table[dallas_crc^i];
 		return dallas_crc;
 	}
 	/*****************************************************************************
@@ -278,13 +278,31 @@ unsigned char dallas_crc_table[] =		// dallas crc lookup table
 	******************************************************************************/
 	inline unsigned char OWI_dallasCRCBuff(unsigned char *ptr, int size)
 	{
-		int i;
-		dallas_crc = 0;
+		int i, j;
+		unsigned char crc = 0;				// current crc global variable
+		unsigned char tmp;
+		unsigned char data;
+
+		/*dallas_crc = 0;
 		for(i=0; i<size; i++){	OWI_dallasCRC(*ptr++);}
-		return dallas_crc;
+		return dallas_crc;*/
+
+		for( i=0; i<size; i++)
+		{
+			data = *ptr++;
+			//вычисление CRC - обрабатываем каждый бит прин€того байта
+			for( j=0; j<8; j++)
+			{
+			  tmp = (crc ^ data) & 0x01;
+			  if (tmp==0x01) crc = crc ^ 0x18;
+			  crc = (crc >> 1) & 0x7F;
+			  if (tmp==0x01) crc = crc | 0x80;
+			  data = data >> 1;
+			}
+		}
+
+		return crc;
 	}
-
-
 
 	/*
 	 * //прочитать 8 байт и вычислить CRC
@@ -303,5 +321,7 @@ unsigned char dallas_crc_table[] =		// dallas crc lookup table
       data = data >> 1;
     }
   }
+  data = ds_read_byte(1<<PinNumb);          //прочитать CRC датчика
+  if(crc==data) return 0;                   //если CRC совпали - значит ошибки нет
+  return 3;                                 //CRC не совпали, ошибка прин€тых данных
   */
-	 */

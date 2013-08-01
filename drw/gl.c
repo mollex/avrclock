@@ -46,13 +46,10 @@
 extern  FontChar_t courierNew_8ptDescriptors[];
 extern  unsigned char courierNew_8ptBitmaps[];
 
-extern  FontChar_t calibri_24ptDescriptors[];
-extern  unsigned char calibri_24ptBitmaps[];
-
 extern  FontChar_t segmental_28ptDescriptors[];
 extern  unsigned char segmental_28ptBitmaps[];
 
-int _Color = 1;
+
 // Font information for Courier New 8pt
 Font_t Font[] =
 {
@@ -67,15 +64,6 @@ Font_t Font[] =
 	},
 	{
 		.heightPages = 2, //  Character height
-		.pt = 40,
-		.startChar = '0', //  Start character
-		.endChar = '9', //  End character
-		.spacePixels = 2, //  Width, in pixels, of space character
-		.charInfo = calibri_24ptDescriptors, //  Character descriptor array
-		.dataPtr = calibri_24ptBitmaps, //  Character bitmap array
-	},
-	{
-		.heightPages = 2, //  Character height
 		.pt = 52,
 		.startChar = '0', //  Start character
 		.endChar = '9', //  End character
@@ -83,11 +71,10 @@ Font_t Font[] =
 		.charInfo = segmental_28ptDescriptors, //  Character descriptor array
 		.dataPtr = segmental_28ptBitmaps, //  Character bitmap array
 	},
-
 };
 
 
-VideoBuf_t	VideoBuf = {
+VideoBuf_t	_VideoBuf = {
 	
 	.xmax = VBUFF_X_MAX,
 	.ymax = VBUFF_Y_MAX,
@@ -111,17 +98,17 @@ static void gl_uart()
 	uint32_t b;
 	
 	printf("\f");
-	for(yl=0; yl < VideoBuf.ymax; yl++){
-		for(xl=0; xl < VideoBuf.xline; xl++){
+	for(yl=0; yl < _VideoBuf.ymax; yl++){
+		for(xl=0; xl < _VideoBuf.xline; xl++){
 			for(b=0; b < 16; b++){
-				if(VideoBuf.vbuff[yl/16][xl][yl] & (1<<b)) printf("#");
+				if(_VideoBuf.vbuff[yl/16][xl][yl] & (1<<b)) printf("#");
 				else printf(".");
 			}
 		}
 		printf("\r\n");
 	}
 	
-	memset(VideoBuf.vbuff, 0, sizeof(VideoBuf.vbuff));
+	memset(_VideoBuf.vbuff, 0, sizeof(_VideoBuf.vbuff));
 }
 /****************************************************************************/
 /**
@@ -134,17 +121,17 @@ static void gl_uart()
  *****************************************************************************/
 void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
 {
-	if(x > VideoBuf.xmax || y > VideoBuf.ymax)	return;
+	if(x > _VideoBuf.xmax || y > _VideoBuf.ymax)	return;
 	
 	uint16_t xline  = x/8;
 	uint16_t yline = y/16;
 	if(val)
 	{
-		VideoBuf.vbuff[yline][xline][y%16] |= (1 << (x%8));
+		_VideoBuf.vbuff[yline][xline][y%16] |= (1 << (x%8));
 	}
 	else
 	{
-		VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
+		_VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
 	}
 }
 /****************************************************************************/

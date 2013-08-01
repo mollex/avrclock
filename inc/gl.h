@@ -42,6 +42,7 @@ typedef struct
 
 }VideoBuf_t;
 
+VideoBuf_t	_VideoBuf;
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
