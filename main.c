@@ -15,6 +15,7 @@
 #include "gl.h"
 #include "font.h"
 #include "owi.h"
+#include "debug.h"
 
 extern void uart_init();
 extern void GL_Test();
@@ -28,8 +29,7 @@ extern Font_t Font[];
 int val = 0;
 int val2 = 0;
 
-extern void tx_print(char *s);
-extern void tx_hexprint(char *s, char len);
+
 
 extern void ds18x20_SelfTest();
 extern void ds18x20_SelfTest();
@@ -40,8 +40,8 @@ extern unsigned char ds18x20_Sign();
 int main(void) {
 	uart_init();
 
-	printf("begin 1 \n\r");
-	tx_print("begin 2 \n\r");
+	DEBUG_PRINTF("begin 1 \n\r");
+	DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
 	dmdp10_Init();
 	ds1307_init();
@@ -58,16 +58,15 @@ int main(void) {
 
 	while (1) {
 
-		tx_print("begin 2 \n\r");
+		DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
 		_delay_ms(1000);
 
 		//ds1307_startstop(1);
 
-		//ds18b20_SelfTest();
 		ds18x20_ReadTemp();
 
-		printf("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
+		//DEBUG_PRINTF("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
 
 			//val = 0;
 			GLClock_SetHour(&Font[1], val++);

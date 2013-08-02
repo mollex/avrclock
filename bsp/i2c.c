@@ -151,18 +151,14 @@ void TWIM_Stop (void)
 char TWIM_Write(uint8_t byte)
 {
 	uint8_t   twst;
-/*
-** Send data to the previously addressed device
-*/
+	//Send data to the previously addressed device
 	TWDR = byte;
 	TWCR = _BV(TWINT)|_BV(TWEN);
-/*
-** Wait until transmission completed
-*/
+
+	//Wait until transmission completed
 	while (!(TWCR & _BV(TWINT)));
-/*
-** Check value of TWI Status Register. Mask prescaler bits
-*/
+
+	//Check value of TWI Status Register. Mask prescaler bits
 	twst = TW_STATUS;
 	if (twst != TW_MT_DATA_ACK)
 		return 1;

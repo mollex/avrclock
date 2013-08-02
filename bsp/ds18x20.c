@@ -21,6 +21,7 @@
 #include <avr/interrupt.h>
 #include <avr/delay.h>
 
+#include "debug.h"
 #include "owi.h"
 /************************** Constant Definitions ****************************/
 
@@ -99,17 +100,18 @@ void ds18x20_SelfTest()
 
 		if(OWI_dallasCRCBuff(Dallas_rom_id.byte, 8))								//Если 0 то сумма корректна
 		{
-			printf("Crc Err \n\r");
+			DEBUG_PRINTF("Crc Err \n\r");
 		}else
 		{
 			Dallas_rom_id.find = 1;
 			Dallas_rom_id.type = Dallas_rom_id.byte[0];
-			printf("\n\r Id Rom: ");
-			for(j=0; j<8; j++){	printf(" 0x%x", Dallas_rom_id.byte[j]);}
+
+			DEBUG_PRINTF("\n\r Id Rom: ");
+			for(j=0; j<8; j++){	DEBUG_PRINTF(" 0x%x", Dallas_rom_id.byte[j]);}
 		}
 	}else
 	{
-		printf("Not found \n\r");
+		DEBUG_PRINTF("Not found \n\r");
 	}
 }
 /**<
@@ -139,12 +141,12 @@ void ds18x20_ReadTemp()
 
 		if(OWI_dallasCRCBuff(Dallas_rom_id.byte, 9))
 		{
-			printf("Crc Err \n\r");
+			DEBUG_PRINTF("Crc Err \n\r");
 
 		}else
 		{
-			//printf("\n\r Temp: ");
-			//for(i=0; i<9; i++){	printf(" 0x%x", Dallas_rom_id.byte[i]);}
+			//DEBUG_PRINTF("\n\r Temp: ");
+			//for(i=0; i<9; i++){	DEBUG_PRINTF(" 0x%x", Dallas_rom_id.byte[i]);}
 
 			// minus sign
 			Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;

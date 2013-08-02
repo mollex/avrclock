@@ -283,9 +283,9 @@ unsigned char  dallas_crc;
 		unsigned char tmp;
 		unsigned char data;
 
-		/*dallas_crc = 0;
-		for(i=0; i<size; i++){	OWI_dallasCRC(*ptr++);}
-		return dallas_crc;*/
+		//dallas_crc = 0;
+		//for(i=0; i<size; i++){	OWI_dallasCRC(*ptr++);}
+		//return dallas_crc;
 
 		for( i=0; i<size; i++)
 		{
