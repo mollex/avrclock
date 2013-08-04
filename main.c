@@ -36,8 +36,11 @@ extern void ds18x20_SelfTest();
 extern unsigned char ds18x20_GetHight();
 extern unsigned char ds18x20_GetLow();
 extern unsigned char ds18x20_Sign();
+extern void rc5Init();
 
 int main(void) {
+
+	unsigned char rc5cmd;
 	uart_init();
 
 	DEBUG_PRINTF("begin 1 \n\r");
@@ -45,6 +48,7 @@ int main(void) {
 
 	dmdp10_Init();
 	ds1307_init();
+	rc5Init();
 	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 
 		sei();
@@ -58,16 +62,21 @@ int main(void) {
 
 	while (1) {
 
-		DEBUG_PRINTF_SOFT("begin 2 \n\r");
+		//DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
-		_delay_ms(1000);
+		_delay_ms(100);
 
 		//ds1307_startstop(1);
 
-		ds18x20_ReadTemp();
+		//ds18x20_ReadTemp();
 
 		//DEBUG_PRINTF("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
 
+		if(rc5GetCmd(&rc5cmd))
+		{
+			//ds1307_startstop(1);
+			ds18x20_ReadTemp();
+		}
 			//val = 0;
 			GLClock_SetHour(&Font[1], val++);
 			GLClock_SetMinutes(&Font[1], 0);

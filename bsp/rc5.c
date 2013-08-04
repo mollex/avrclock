@@ -35,21 +35,22 @@
 #include <avr/delay.h>
 
 /************************** Constant Definitions ****************************/
-#define	RC5_PORT_SET	DDRB
-#define	RC5_PORT_IN		PINB
-#define	RC5_PIN			PB0			// IR input low active
+#define	RC5_PORT_SET	DDRC
+#define	RC5_PORT_IN		PINC
+#define	RC5_PIN			PC5			// IR input low active
 
 #define	XTAL		16000000
 
 #define RC5TIME 	1.778e-3		// 1.778msec
-//#define PULSE_MIN	(uint8_t)(XTAL / 512 * RC5TIME * 0.4 + 0.5)
-//#define PULSE_1_2	(uint8_t)(XTAL / 512 * RC5TIME * 0.8 + 0.5)
-//#define PULSE_MAX	(uint8_t)(XTAL / 512 * RC5TIME * 1.2 + 0.5)
-#define PULSE_MIN	(uint8_t)(XTAL / 2048 * RC5TIME * 0.4 + 0.5)
-#define PULSE_1_2	(uint8_t)(XTAL / 2048 * RC5TIME * 0.8 + 0.5)
-#define PULSE_MAX	(uint8_t)(XTAL / 2048 * RC5TIME * 1.2 + 0.5)
+#define PULSE_MIN	(uint8_t)(XTAL / 512 * RC5TIME * 0.4 + 0.5)
+#define PULSE_1_2	(uint8_t)(XTAL / 512 * RC5TIME * 0.8 + 0.5)
+#define PULSE_MAX	(uint8_t)(XTAL / 512 * RC5TIME * 1.2 + 0.5)
+//#define PULSE_MIN	(uint8_t)(XTAL / 2048 * RC5TIME * 0.4 + 0.5)
+//#define PULSE_1_2	(uint8_t)(XTAL / 2048 * RC5TIME * 0.8 + 0.5)
+//#define PULSE_MAX	(uint8_t)(XTAL / 2048 * RC5TIME * 1.2 + 0.5)
 /**************************** Type Definitions ******************************/
 
+extern void dmdp10_Scan();
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
@@ -58,11 +59,7 @@ uint8_t	rc5_time;				// count bit time
 uint16_t	rc5_tmp;			// shift bits in
 uint16_t	rc5_data;			// store result
 
-extern uint8_t uartIsTmout;
 /************************** Function Prototypes *****************************/
-uint16_t rc5GetValue();
-void  rc5SetValue(uint16_t val);
-
 
 /**<
  * **************************************************************************
@@ -73,11 +70,11 @@ void  rc5SetValue(uint16_t val);
  ***************************************************************************/
 ISR (TIMER0_OVF_vect)
 {
-//PORTB++;
+	//PORTC++;
 	uint16_t tmp = rc5_tmp;				// for faster access
 
-  //TCNT0 = -2;					// 2 * 256 = 512 cycle
-  TCNT0 = -8;					// 8 * 256 = 2048 cycle
+  TCNT0 = -2;					// 2 * 256 = 512 cycle
+  //TCNT0 = -8;					// 8 * 256 = 2048 cycle
 
   if( ++rc5_time > PULSE_MAX ){				// count pulse time
     if( !(tmp & 0x4000) && tmp & 0x2000 )	// only if 14 bits received
@@ -99,12 +96,6 @@ ISR (TIMER0_OVF_vect)
   }
 
   rc5_tmp = tmp;
-
-  static uint8_t count;
-  if(!(count++ & 0x7F))
-		uartIsTmout = 0;
-
-
 }
 /**<
  * **************************************************************************
@@ -116,7 +107,7 @@ ISR (TIMER0_OVF_vect)
 void rc5Init()
 {
 	RC5_PORT_SET &=  ~(1<<RC5_PIN);
-	PORTD |= (1<<RC5_PIN);
+	PORTC |= (1<<RC5_PIN);
 	TCCR0B = 1<<CS02;			//divide by 256
 	TIMSK0 = 1<<TOIE0;			//enable timer interrupt
 }
@@ -157,7 +148,7 @@ uint8_t rc5GetCmd(uint8_t *outPtr)
 
 	/*printf("\n\r ntgl %d", cmd.tgl);
 	printf("\n\r naddr %d", cmd.addr);*/
-	printf("\n\r key %d\n\r", cmd.key);
+	printf("\n\r key 0x%x\n\r", cmd.key);
 
 	*outPtr = cmd.key;
 

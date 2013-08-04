@@ -145,8 +145,8 @@ void ds18x20_ReadTemp()
 
 		}else
 		{
-			//DEBUG_PRINTF("\n\r Temp: ");
-			//for(i=0; i<9; i++){	DEBUG_PRINTF(" 0x%x", Dallas_rom_id.byte[i]);}
+			DEBUG_PRINTF("\n\r Temp: ");
+			for(i=0; i<9; i++){	DEBUG_PRINTF(" 0x%x", Dallas_rom_id.byte[i]);}
 
 			// minus sign
 			Dallas_rom_id.tempS = Dallas_rom_id.byte[1] & 0x80;
