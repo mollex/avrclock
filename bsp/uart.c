@@ -70,7 +70,7 @@
 
 /**************************** Type Definitions ******************************/
 //#define F_CPU			10000000
-#define BAUD_RATE		38400
+#define BAUD_RATE		57600
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
@@ -155,6 +155,8 @@ void uart_init()
 	UBRRXL = baud_setting;
 
 	//UCSRXA = 0; // clear error flags, disable U2X and MPCM
+
+	uart_rxIntr(0);
 
 	stdout = &mystdout;
 

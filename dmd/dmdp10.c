@@ -64,15 +64,14 @@ LED Panel Layout in RAM
 // ######################################################################################################################
 //#warning CHANGE THESE TO SEMI-ADJUSTABLE PIN DEFS!
 //Arduino pins used for the display connection
-#define PIN_DMD_nOE       9    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
-#define PIN_DMD_A         6    // D6
+#define PIN_DMD_nOE       6    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
+#define PIN_DMD_A         0    // D0
 #define PIN_DMD_B         7    // D7
-#define PIN_DMD_CLK       13   // D13_SCK  is SPI Clock if SPI is used
-#define PIN_DMD_SCLK      8    // D8
-#define PIN_DMD_R_DATA    11   // D11_MOSI is SPI Master Out if SPI is used
+#define PIN_DMD_CLK       5   // D13_SCK  is SPI Clock if SPI is used
+#define PIN_DMD_SCLK      1    // D8
+#define PIN_DMD_R_DATA    3   // D11_MOSI is SPI Master Out if SPI is used
 //Define this chip select pin that the Ethernet W5100 IC or other SPI device uses
 //if it is in use during a DMD scan request then scanDisplayBySPI() will exit without conflict! (and skip that scan)
-#define PIN_OTHER_SPI_nCS 10
 
 /**************************** Type Definitions ******************************/
 
@@ -86,14 +85,14 @@ LED Panel Layout in RAM
 #endif
 
 //DMD I/O pin macros
-#define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORTD, 7 ); cbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORTD, 7 ); sbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_03_07_11_15()       { sbi( PORTD, 7 ); cbi( PORTD, 6 ); }
-#define LIGHT_DMD_ROW_04_08_12_16()       { sbi( PORTD, 7 ); sbi( PORTD, 6 ); }
+#define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORTD, PIN_DMD_B ); cbi( PORTB, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORTD, PIN_DMD_B ); sbi( PORTB, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_03_07_11_15()       { sbi( PORTD, PIN_DMD_B ); cbi( PORTB, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_04_08_12_16()       { sbi( PORTD, PIN_DMD_B ); sbi( PORTB, PIN_DMD_A ); }
 
-#define LATCH_DMD_SHIFT_REG_TO_OUTPUT()   { sbi( PORTB, 0 ); cbi( PORTB,  0 ); }
-#define OE_DMD_ROWS_OFF()                 { cbi( PORTB, 1 ); }
-#define OE_DMD_ROWS_ON()                  { sbi( PORTB, 1 ); }
+#define LATCH_DMD_SHIFT_REG_TO_OUTPUT()   { sbi( PORTB, PIN_DMD_SCLK ); cbi( PORTB,  PIN_DMD_SCLK ); }
+#define OE_DMD_ROWS_OFF()                 { cbi( PORTD, PIN_DMD_nOE ); }
+#define OE_DMD_ROWS_ON()                  { sbi( PORTD, PIN_DMD_nOE ); }
 
 /************************** Variable Definitions ****************************/
 
@@ -101,7 +100,6 @@ LED Panel Layout in RAM
 extern void spi_init();
 extern char spi_transfer(char b);
 void dmdp10_Scan();
-
 
 /**<
  * **************************************************************************
@@ -238,17 +236,18 @@ void dmdp10_Scan()
  ***************************************************************************/
 void dmdp10_Init()
 {
-	DDRB  = (1<<0) | (1<<1);
+	DDRB  = (1<<PIN_DMD_A) | (1<<PIN_DMD_SCLK);
 	PORTB = 0x00;
 
-	DDRD  = (1<<7) | (1<<6);
+	DDRD  = (1<<PIN_DMD_B) | (1<<PIN_DMD_nOE);
 	PORTD= 0x00;
 
 	spi_init();
 
 #if defined (__AVR_ATmega8__)
 
-
+		TCCR2 = 1<<CS22 | 1<<CS20;			//divide by 128
+		TIMSK = 1<<TOIE2;			//enable timer interrupt
 
 #else
 		TCCR2B = 1<<CS02;			//divide by 256

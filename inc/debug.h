@@ -32,7 +32,7 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /* Print messages to uart console */
-#if 1
+#if 0
 #	define	DEBUG_PRINTF(format, ...)   printf(format,## __VA_ARGS__)
 #else
 #	define DEBUG_PRINTF(...)
