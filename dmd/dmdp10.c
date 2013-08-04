@@ -246,6 +246,14 @@ void dmdp10_Init()
 
 	spi_init();
 
-	TCCR2B = 1<<CS02;			//divide by 256
-	TIMSK2 = 1<<TOIE0;			//enable timer interrupt
+#if defined (__AVR_ATmega8__)
+
+
+
+#else
+		TCCR2B = 1<<CS02;			//divide by 256
+		TIMSK2 = 1<<TOIE0;			//enable timer interrupt
+#endif
+
+
 }

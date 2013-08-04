@@ -108,8 +108,16 @@ void rc5Init()
 {
 	RC5_PORT_SET &=  ~(1<<RC5_PIN);
 	PORTC |= (1<<RC5_PIN);
-	TCCR0B = 1<<CS02;			//divide by 256
-	TIMSK0 = 1<<TOIE0;			//enable timer interrupt
+
+
+#if defined (__AVR_ATmega8__)
+
+
+
+#else
+		TCCR0B = 1<<CS02;			//divide by 256
+		TIMSK0 = 1<<TOIE0;			//enable timer interrupt
+#endif
 }
 
 

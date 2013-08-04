@@ -44,7 +44,6 @@ int main(void) {
 	uart_init();
 
 	DEBUG_PRINTF("begin 1 \n\r");
-	DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
 	dmdp10_Init();
 	ds1307_init();

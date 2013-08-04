@@ -43,25 +43,12 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-extern  FontChar_t courierNew_8ptDescriptors[];
-extern  unsigned char courierNew_8ptBitmaps[];
-
 extern  FontChar_t segmental_28ptDescriptors[];
 extern  unsigned char segmental_28ptBitmaps[];
-
 
 // Font information for Courier New 8pt
 Font_t Font[] =
 {
-	{
-		.heightPages = 1, //  Character height
-		.pt = 7,
-		.startChar = '0', //  Start character
-		.endChar = '9', //  End character
-		.spacePixels = 1, //  Width, in pixels, of space character
-		.charInfo = courierNew_8ptDescriptors, //  Character descriptor array
-		.dataPtr = courierNew_8ptBitmaps, //  Character bitmap array
-	},
 	{
 		.heightPages = 2, //  Character height
 		.pt = 52,
