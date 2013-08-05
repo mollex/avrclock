@@ -49,8 +49,7 @@ int main(void) {
 	dmdp10_Init();
 	//ds1307_init();
 	//rc5Init();
-	//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-
+	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		sei();
 
 
@@ -63,8 +62,7 @@ int main(void) {
 
 		//DEBUG_PRINTF_SOFT("begin 2 \n\r");
 		printf("C  %d\n\r", i++);
-		_delay_ms(1000);
-
+		_delay_ms(500);
 		//ds1307_startstop(1);
 
 		//ds18x20_ReadTemp();
@@ -76,10 +74,11 @@ int main(void) {
 			//ds1307_startstop(1);
 			ds18x20_ReadTemp();
 		}*/
-			//val = 0;
+			val = 0;
 			GLClock_SetHour(&Font[0], val++);
 			GLClock_SetMinutes(&Font[0], 0);
 			GLClock_SetDots(val & 0x1);
+
 			//GL_DrawNumber(&Font[1], 1, 2,val2++,1);
 			//GL_DrawNumber(&Font[0], 0, 0,2222,1);
 			//GL_DrawNumber(&Font[0], 32, 5,3333,1);

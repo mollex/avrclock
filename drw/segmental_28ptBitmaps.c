@@ -39,7 +39,7 @@
 /************************** Function Prototypes *****************************/
 
 // Character bitmaps for Segmental 28pt
-unsigned char segmental_28ptBitmaps[] PROGMEM =
+unsigned char segmental_28ptBitmaps[]  =
 {
 		// @0 '0' (14 pixels wide)
 			0xFC, 0x1F, //   ###########
@@ -209,7 +209,7 @@ unsigned char segmental_28ptBitmaps[] PROGMEM =
 			0x7C, 0x3F, //   ##### ######
 			0xFE, 0x1F, //  ############
 
-			// @312 '6' (15 pixels wide)
+		/*	// @312 '6' (15 pixels wide)
 			0xFC, 0x1F, //   ###########
 			0x7F, 0x3F, // ####### ######
 			0x07, 0x00, // ###
@@ -347,7 +347,7 @@ unsigned char segmental_28ptBitmaps[] PROGMEM =
 			0x0F, // ####
 			0x0F, // ####
 			0x0F, // ####
-			0x0F, // ####
+			0x0F, // ####*/
 };
 
 // Character descriptors for Segmental 28pt

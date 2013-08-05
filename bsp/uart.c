@@ -142,9 +142,10 @@ void uart_rxIntr(char b)
  ***************************************************************************/
 void uart_init()
 {
-	DDRD &= ~(0x03);
+	DDRD &= ~_BV(PD0);
+	DDRD |= _BV(PD1);
 
-	UCSRXB = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0);
+	UCSRXB = _BV(RXEN0) | _BV(TXEN0);// | _BV(RXCIE0);
 	UCSRXC = _BV(UCSZ00) | _BV(UCSZ01);
 
 	uint16_t baud_setting;
@@ -156,8 +157,5 @@ void uart_init()
 
 	//UCSRXA = 0; // clear error flags, disable U2X and MPCM
 
-	uart_rxIntr(0);
-
 	stdout = &mystdout;
-
 }

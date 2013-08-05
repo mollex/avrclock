@@ -236,10 +236,10 @@ void dmdp10_Scan()
  ***************************************************************************/
 void dmdp10_Init()
 {
-	DDRB  = (1<<PIN_DMD_A) | (1<<PIN_DMD_SCLK);
+	DDRB  |= (1<<PIN_DMD_A) | (1<<PIN_DMD_SCLK);
 	PORTB = 0x00;
 
-	DDRD  = (1<<PIN_DMD_B) | (1<<PIN_DMD_nOE);
+	DDRD  |= (1<<PIN_DMD_B) | (1<<PIN_DMD_nOE);
 	PORTD= 0x00;
 
 	spi_init();
