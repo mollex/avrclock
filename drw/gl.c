@@ -62,12 +62,12 @@ Font_t Font[] =
 
 
 VideoBuf_t	_VideoBuf = {
-	
+
 	.xmax = VBUFF_X_MAX,
 	.ymax = VBUFF_Y_MAX,
 	.xline = VBUFF_X_LINE,
 	.yline = VBUFF_Y_LINE,
-	
+
 };
 /************************* Function Prototypes *****************************/
 /****************************************************************************/
@@ -79,11 +79,11 @@ VideoBuf_t	_VideoBuf = {
  * @return None.
  *
  *****************************************************************************/
-static void gl_uart()
+/*static void gl_uart()
 {
 	int xl, yl;
 	uint32_t b;
-	
+
 	printf("\f");
 	for(yl=0; yl < _VideoBuf.ymax; yl++){
 		for(xl=0; xl < _VideoBuf.xline; xl++){
@@ -94,9 +94,9 @@ static void gl_uart()
 		}
 		printf("\r\n");
 	}
-	
+
 	memset(_VideoBuf.vbuff, 0, sizeof(_VideoBuf.vbuff));
-}
+}*/
 /****************************************************************************/
 /**
  * @brief	 	Функция
@@ -109,7 +109,7 @@ static void gl_uart()
 void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
 {
 	if(x > _VideoBuf.xmax || y > _VideoBuf.ymax)	return;
-	
+
 	uint16_t xline  = x/8;
 	uint16_t yline = y/16;
 	if(val)
@@ -142,6 +142,7 @@ int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
 		for(i=0; i<font->charInfo[index].widthBits; i++)
 		{
 			gl_setpixel(x0+i, y0,  font->dataPtr[font->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
+			//gl_setpixel(x0+i, y0,  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j +  i/8])) & (1<<(i%8)));
 		}
 		y0++;
 	}
@@ -165,12 +166,10 @@ void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t
 	uint8_t t, i=0;
 	do{
 		t = buffer[i++];
-		//printf("off %d\n\r",x0);
 		x0 += GL_DrawChar(font, x0, y0, t);
 	}
 	while(t);
 }
-
 /****************************************************************************/
 /**
  * @brief	 	Функция

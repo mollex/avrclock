@@ -42,12 +42,10 @@
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-
 ISR(SPI_STC_vect)
  {
 
  }
-
 /**<
  * **************************************************************************
  * @brief	Function send char by different interface
@@ -59,7 +57,6 @@ ISR(SPI_STC_vect)
 {
 	SPDR = b;
 }*/
-
 /**<
  * **************************************************************************
  * @brief	Function send then get char by different interface

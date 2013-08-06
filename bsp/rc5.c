@@ -50,7 +50,6 @@
 //#define PULSE_MAX	(uint8_t)(XTAL / 2048 * RC5TIME * 1.2 + 0.5)
 /**************************** Type Definitions ******************************/
 
-extern void dmdp10_Scan();
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
@@ -121,9 +120,6 @@ void rc5Init()
 }
 
 
-
-
-
 typedef struct
 {
 	union {
@@ -156,11 +152,9 @@ uint8_t rc5GetCmd(uint8_t *outPtr)
 
 	/*printf("\n\r ntgl %d", cmd.tgl);
 	printf("\n\r naddr %d", cmd.addr);*/
-	printf("\n\r key 0x%x\n\r", cmd.key);
+	//printf("\n\r key 0x%x\n\r", cmd.key);
 
 	*outPtr = cmd.key;
 
 	return 1;
 }
-
-

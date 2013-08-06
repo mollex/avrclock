@@ -72,11 +72,10 @@
 //#define F_CPU			10000000
 #define BAUD_RATE		57600
 /***************** Macros (Inline Functions) Definitions ********************/
-
 /************************** Variable Definitions ****************************/
-uint8_t uartIsTmout;
 /************************** Function Prototypes *****************************/
 void uart_putch(char ch);
+
 
 FILE mystdout = FDEV_SETUP_STREAM(uart_putch, NULL,
                                            _FDEV_SETUP_WRITE);
@@ -90,7 +89,7 @@ FILE mystdout = FDEV_SETUP_STREAM(uart_putch, NULL,
 
 ISR(USART_RX_vect)
  {
-	
+
  }
 
 /**<

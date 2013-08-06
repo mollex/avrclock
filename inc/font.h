@@ -20,7 +20,6 @@
 *
 ******************************************************************************/
 
-
 #ifndef FONT_H_
 #define FONT_H_
 
@@ -33,14 +32,13 @@
 /**************************** Type Definitions ******************************/
 
 
-
 // This structure describes a single character's display information
 typedef struct
 {
 	const char widthBits;					// width, in bits (or pixels), of the character
 	const short offset;					// offset of the character's bitmap, in bytes, into the the FONT_INFO's data array
-	
-} FontChar_t;	
+
+} FontChar_t;
 
 // Describes a single font
 typedef struct
@@ -52,8 +50,8 @@ typedef struct
 	char			spacePixels;	// number of pixels that a space character takes up
 	FontChar_t*		charInfo;		// pointer to array of char information
 	unsigned char*	dataPtr;		// pointer to generated array of character visual representation
-		
-} Font_t;	
+
+} Font_t;
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
