@@ -35,11 +35,11 @@
 #include <avr/delay.h>
 
 /************************** Constant Definitions ****************************/
-#define	RC5_PORT_SET	DDRC
-#define	RC5_PORT_IN		PINC
-#define	RC5_PIN			PC5			// IR input low active
+#define	RC5_PORT_SET	DDRD
+#define	RC5_PORT_IN		PIND
+#define	RC5_PIN			PD3			// IR input low active
 
-#define	XTAL		16000000
+#define	XTAL		8000000
 
 #define RC5TIME 	1.778e-3		// 1.778msec
 #define PULSE_MIN	(uint8_t)(XTAL / 512 * RC5TIME * 0.4 + 0.5)
@@ -111,7 +111,8 @@ void rc5Init()
 
 #if defined (__AVR_ATmega8__)
 
-
+	TCCR0 = 1<<CS02;			//divide by 256
+	TIMSK |= 1<<TOIE1;			//enable timer interrupt
 
 #else
 		TCCR0B = 1<<CS02;			//divide by 256

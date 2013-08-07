@@ -61,7 +61,7 @@ extern void dmdp10_Init();
 
 
 extern Font_t Font[];
-//int val = 0;
+char val = 0;
 //int val2 = 0;
 
 extern void GLClock_ShowTemp(unsigned char val, unsigned char sign);
@@ -78,7 +78,11 @@ extern unsigned char  rc5GetCmd(unsigned char  *outPtr);
 void Task_Temp()
 {
 	ds18x20_ReadTemp();
+	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 	GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign);
+	val = ds18x20_GetHight();
+	tx_print_usart("T  ");
+			tx_hexprint_usart(&val, 1);
 	//DEBUG_PRINTF("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
 }
 
@@ -177,19 +181,25 @@ int main(void) {
 	ds18x20_ReadTemp();
 	dmdp10_Init();
 	//ds1307_init();
-	//rc5Init();
+	rc5Init();
 	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 
 	sei();
-
+	//GLClock_ShowClock(12, i++, 1);
+	GLClock_ShowTemp(55, 0);
 	while (1) {
 
-		printf("C  %d\n\r", i++);
+		tx_print_usart("C  ");
+		tx_hexprint_usart(&i, 1);
 		_delay_ms(500);
 
-		//Task_Temp();
 
-		GLClock_ShowClock(12, 34, 1);
+		//Task_Temp();
+		_delay_ms(1500);
+		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		GLClock_ShowClock(88, 00, 1);
+
+
 	}
 
 }

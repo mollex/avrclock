@@ -70,15 +70,15 @@
 
 /**************************** Type Definitions ******************************/
 //#define F_CPU			10000000
-#define BAUD_RATE		9600/*57600*/
+#define BAUD_RATE		57600
 /***************** Macros (Inline Functions) Definitions ********************/
 /************************** Variable Definitions ****************************/
 /************************** Function Prototypes *****************************/
 void uart_putch(char ch);
 
 
-FILE mystdout = FDEV_SETUP_STREAM(uart_putch, NULL,
-                                           _FDEV_SETUP_WRITE);
+/*FILE mystdout = FDEV_SETUP_STREAM(uart_putch, NULL,
+                                           _FDEV_SETUP_WRITE);*/
 /**<
  * **************************************************************************
  * @brief	Function interrupt UART recv
@@ -156,5 +156,30 @@ void uart_init()
 
 	//UCSRXA = 0; // clear error flags, disable U2X and MPCM
 
-	stdout = &mystdout;
+	//stdout = &mystdout;
+}
+
+void tx_print_usart(char *s)
+{
+	while(*s)
+	{
+		uart_putch (*s++);
+	}
+}
+
+void tx_hexprint_usart(char *s, char len)
+{
+	char b[6] = {'0', 'x', 'q','q', ' ', 0};
+	register char r1 = 0;
+	register char r2 = 0;
+	while(len--)
+	{
+		r1 = r2 = *s++;
+		r1 = r1>>4;
+		r2 &= 0x0F;
+		b[2] = r1 + ((r1>9) ? 0x57 : 0x30);
+ 		b[3] = r2 + ((r2>9) ? 0x57 : 0x30);
+ 		tx_print_usart(b);
+	}
+	tx_print_usart(" \n\r");
 }

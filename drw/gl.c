@@ -170,7 +170,7 @@ int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
 {
 	uint8_t i, j;
 
-	if(ch < '0' || ch > '9') return 0;
+	//if(ch < '0' || ch > '9') return 0;
 
 	int index = ch - '0';
 	for(j=0; j<font->pt; j+=font->heightPages)
@@ -263,15 +263,23 @@ void GLClock_SetTemp(Font_t *font, unsigned char val, unsigned char sign)
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
 
-	GL_DrawChar(font, 12, 3, hight);
-	GL_DrawChar(font, 20, 3, low);
+	GL_DrawChar(font, 11, 3, hight);
+	GL_DrawChar(font, 28, 3, low);
+	GL_DrawChar(font, 50, 3, 'C');
 
+
+	GL_DrawLine(44, 3, 48, 3, 1);
+	GL_DrawLine(44, 8, 48, 8, 1);
+	GL_DrawLine(44, 3, 44, 8, 1);
+	GL_DrawLine(48, 3, 48, 8, 1);
+
+
+	GL_DrawLine(0, 15, 9, 15, 1);
+	GL_DrawLine(0, 16, 9, 16, 1);
 	if(sign)
 	{
-		GL_DrawLine(2, 15, 6, 15, 1);
-	}else
-	{
-		GL_DrawLine(4, 12, 4, 18, 1);
+		GL_DrawLine(4, 11, 4, 20, 1);
+		GL_DrawLine(5, 11, 5, 20, 1);
 	}
 }
 
