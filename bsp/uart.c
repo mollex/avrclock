@@ -70,7 +70,7 @@
 
 /**************************** Type Definitions ******************************/
 //#define F_CPU			10000000
-#define BAUD_RATE		57600
+#define BAUD_RATE		9600/*57600*/
 /***************** Macros (Inline Functions) Definitions ********************/
 /************************** Variable Definitions ****************************/
 /************************** Function Prototypes *****************************/

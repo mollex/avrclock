@@ -140,7 +140,7 @@ typedef struct
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-uint8_t rc5GetCmd(uint8_t *outPtr)
+unsigned char  rc5GetCmd(unsigned char  *outPtr)
 {
 	RC_t cmd;
 	cli();

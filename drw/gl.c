@@ -121,6 +121,42 @@ void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
 		_VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
 	}
 }
+void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color) {
+
+	uint16_t dy = y1 - y0;
+	uint16_t dx = x1 - x0;
+	uint16_t stepx, stepy;
+
+	if (dy < 0) { dy = -dy;  stepy = -1; } else { stepy = 1; }
+	if (dx < 0) { dx = -dx;  stepx = -1; } else { stepx = 1; }
+	dy <<= 1;                                                  // dy is now 2*dy
+	dx <<= 1;                                                  // dx is now 2*dx
+
+	gl_setpixel(x0, y0, color);
+	if (dx > dy) {
+		int fraction = dy - (dx >> 1);                         // same as 2*dy - dx
+		while (x0 != x1) {
+			if (fraction >= 0) {
+				y0 += stepy;
+				fraction -= dx;                                // same as fraction -= 2*dx
+			}
+			x0 += stepx;
+			fraction += dy;                                    // same as fraction -= 2*dy
+			gl_setpixel(x0, y0, color);
+		}
+	} else {
+		int fraction = dx - (dy >> 1);
+		while (y0 != y1) {
+			if (fraction >= 0) {
+				x0 += stepx;
+				fraction -= dy;
+			}
+			y0 += stepy;
+			fraction += dx;
+			gl_setpixel(x0, y0, color);
+		}
+	}
+}
 /****************************************************************************/
 /**
  * @brief	 	Функция
@@ -207,7 +243,39 @@ void GLClock_SetDots(char val)
 	gl_setpixel(32, 8,  val);
 	gl_setpixel(32, 9,  val);
 }
-void GLClock_SetTemp(Font_t *font, char val)
+void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 {
+	GLClock_SetHour(&Font[0], hour);
+	GLClock_SetMinutes(&Font[0], min);
+	GLClock_SetDots(dot);
+}
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
+void GLClock_SetTemp(Font_t *font, unsigned char val, unsigned char sign)
+{
+	char hight = val/10 + '0';
+	char low = val%10 + '0';
 
+	GL_DrawChar(font, 12, 3, hight);
+	GL_DrawChar(font, 20, 3, low);
+
+	if(sign)
+	{
+		GL_DrawLine(2, 15, 6, 15, 1);
+	}else
+	{
+		GL_DrawLine(4, 12, 4, 18, 1);
+	}
+}
+
+void GLClock_ShowTemp(unsigned char val, unsigned char sign)
+{
+	 GLClock_SetTemp(&Font[0], val, sign);
 }
