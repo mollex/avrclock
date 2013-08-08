@@ -38,7 +38,31 @@
  * @param 	None.
  * @return  None.
  ***************************************************************************/
+unsigned char ds1307_read(unsigned char addr)
+{
+  uint8_t sec;
 
+  TWIM_Start(DS1307_ADDR, TW_WRITE);
+  TWIM_Write(0x00);
+  TWIM_Stop();
+
+  TWIM_Start(DS1307_ADDR, TW_READ);
+  sec =  TWIM_ReadAck();
+  TWIM_ReadNack();
+
+  TWIM_Start(DS1307_ADDR, TW_WRITE);
+  TWIM_Write(0x00);
+  if(bit)
+  {
+	  TWIM_Write(sec & 0x7F);
+  }else
+  {
+	  TWIM_Write(sec | 0x80); //hold
+  }
+  TWIM_Stop();
+
+  return;
+}
 /**<
  * **************************************************************************
  * @brief	Function send char by different interface
