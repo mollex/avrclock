@@ -25,7 +25,15 @@
 /************************** Constant Definitions ****************************/
 #define DS1307_ADDR (0x68<<1)
 /**************************** Type Definitions ******************************/
+	typedef struct
+	{
+		unsigned char sec;
+		unsigned char min;
+		unsigned char hour;
 
+	} DS1307_t;
+
+	DS1307_t     _DS1307;
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
@@ -33,93 +41,111 @@
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************
- * @brief	Function interrupt UART recv
+ * @brief	Function read
+ *
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+inline unsigned char ds1307_getmin()
+{
+	return _DS1307.min;
+}
+inline unsigned char ds1307_gethour()
+{
+	return _DS1307.hour;
+}
+/**<
+ * **************************************************************************
+ * @brief	Function read
+ *
+ * @param 	None.
+ * @return  None.
+ ***************************************************************************/
+// Convert Decimal to Binary Coded Decimal (BCD)
+unsigned char dec2bcd(unsigned char num)
+{
+  return ((num/10 * 16) + (num % 10));
+}
+// Convert Binary Coded Decimal (BCD) to Decimal
+unsigned char bcd2dec(unsigned char num)
+{
+  return ((num/16 * 10) + (num % 16));
+}
+/**<
+ * **************************************************************************
+ * @brief	Function read
  *
  * @param 	None.
  * @return  None.
  ***************************************************************************/
 unsigned char ds1307_read(unsigned char addr)
 {
-  uint8_t sec;
+	unsigned char val;
+	TWIM_Start(DS1307_ADDR, TW_WRITE);
+	TWIM_Write(0x00);
+	TWIM_Stop();
 
-  TWIM_Start(DS1307_ADDR, TW_WRITE);
-  TWIM_Write(0x00);
-  TWIM_Stop();
+	TWIM_Start(DS1307_ADDR, TW_READ);
+	val =  TWIM_ReadAck();
+	TWIM_ReadNack();
+	TWIM_Stop();
 
-  TWIM_Start(DS1307_ADDR, TW_READ);
-  sec =  TWIM_ReadAck();
-  TWIM_ReadNack();
-
-  TWIM_Start(DS1307_ADDR, TW_WRITE);
-  TWIM_Write(0x00);
-  if(bit)
-  {
-	  TWIM_Write(sec & 0x7F);
-  }else
-  {
-	  TWIM_Write(sec | 0x80); //hold
-  }
-  TWIM_Stop();
-
-  return;
+	return val;
 }
 /**<
  * **************************************************************************
- * @brief	Function send char by different interface
+ * @brief	Function write
  *
  * @param 	b. 	char send value
  * @return  None.
  ***************************************************************************/
-
-
+void ds1307_write(unsigned char addr, unsigned char val)
+{
+  TWIM_Start(DS1307_ADDR, TW_WRITE);
+  TWIM_Write(addr);
+  TWIM_Write(val);
+  TWIM_Stop();
+}
 /**<
  * **************************************************************************
- * @brief	Function send then get char by different interface
+ * @brief	Function
  *
- * @param 	b. 	char send value
- * @return  Char.	Receive value
+ * @param 	b.
+ * @return  none
  ***************************************************************************/
 void ds1307_startstop(char bit)
 {
   uint8_t sec;
 
-  TWIM_Start(DS1307_ADDR, TW_WRITE);
-  TWIM_Write(0x00);
-  TWIM_Stop();
+  sec =  ds1307_read(0);
 
-  TWIM_Start(DS1307_ADDR, TW_READ);
-  sec =  TWIM_ReadAck();
-  TWIM_ReadNack();
-
-  TWIM_Start(DS1307_ADDR, TW_WRITE);
-  TWIM_Write(0x00);
   if(bit)
   {
-	  TWIM_Write(sec & 0x7F);
+	  ds1307_write(0, sec & 0x7F);
   }else
   {
-	  TWIM_Write(sec | 0x80); //hold
+	  ds1307_write(0, sec | 0x80); //hold
   }
-  TWIM_Stop();
- /*
-  //get second and CH bit
-  Wire.beginTransmission(DS1307_ADDR);
-  Wire.write(byte(0x00));
-  Wire.endTransmission();
-  Wire.requestFrom(DS1307_ADDR, 1);
-  sec = Wire.read();
-  Wire.read();
-
-  //set second and clear CH bit
-  Wire.beginTransmission(DS1307_ADDR);
-  Wire.write(byte(0x00));
-  Wire.write(sec & 0x7F);
-  Wire.endTransmission();*/
-
-  return;
 }
+/**<
+ * **************************************************************************
+ * @brief	Function
+ *
+ * @param 	b.
+ * @return  none
+ ***************************************************************************/
+void ds1307_update()
+{
+  _DS1307.sec =  bcd2dec(ds1307_read(0));
+  _DS1307.min =  bcd2dec(ds1307_read(1));
+  _DS1307.hour =  ds1307_read(3);
 
+  if (_DS1307.hour & (1<<6))
+	 _DS1307.hour = (_DS1307.hour & 0xF) + (12 * ((_DS1307.hour & 0x20) >> 5));
+  else
+	 _DS1307.hour = (_DS1307.hour & 0xF) + (10 * ((_DS1307.hour & 0x30) >> 4));
 
+}
 /**<
  * **************************************************************************
  * @brief	Function initializing peripherals
@@ -130,5 +156,5 @@ void ds1307_startstop(char bit)
 void ds1307_init()
 {
 	// Initiate TWI Master with bitrate of 100000 Hz
-		TWIM_Init (100000);
+	TWIM_Init (100000);
 }
