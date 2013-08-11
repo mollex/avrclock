@@ -113,6 +113,7 @@ void dmdp10_Scan();
 ISR (TIMER2_OVF_vect)
 {
 	 dmdp10_Scan();
+	 //TCNT2 = -128;
 }
 /**<
  * **************************************************************************
@@ -176,19 +177,34 @@ ISR (TIMER2_OVF_vect)
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-inline void dmdp10_scanQadroModule(char chnl)
+extern char spi_buff[4];
+extern int spi_count;
+char dmdp10_scanQadroModule(char chnl)
 {
-	int j = 1;
-	do
-	{
-		for (int i=0;i<8;i++) {
+	static int j = 1;
+	static int i = 0;
+	char ret = 1;
 
-			spi_transfer(~_VideoBuf.vbuff[j][i][12 + chnl]);
+	//spi_count = 1;
+	/*spi_buff[1] = (~_VideoBuf.vbuff[j][i][8 + chnl]);
+	spi_buff[2] = (~_VideoBuf.vbuff[j][i][4 + chnl]);
+	spi_buff[3] = (~_VideoBuf.vbuff[j][i][0 + chnl]);*/
+	//spi_send(~_VideoBuf.vbuff[j][i][12 + chnl]);
+
+			/*spi_transfer(~_VideoBuf.vbuff[j][i][12 + chnl]);
 			spi_transfer(~_VideoBuf.vbuff[j][i][8 + chnl]);
 			spi_transfer(~_VideoBuf.vbuff[j][i][4 + chnl]);
-			spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);
-		}
-	}while(j--);
+			spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);*/
+
+			if(++i > 7)
+			{
+				i = 0;
+
+				if(j-- <= 0){ j = 1; ret = 0;}
+			}
+
+
+	return ret;
 }
 /**<
  * **************************************************************************
@@ -201,31 +217,31 @@ void dmdp10_Scan()
 {
 	static uint8_t chnl = 0;
 
-	if(chnl>3) chnl = 0;
+	if(dmdp10_scanQadroModule(chnl) == 0)
+	{
+		OE_DMD_ROWS_OFF();
+		LATCH_DMD_SHIFT_REG_TO_OUTPUT();
 
-	dmdp10_scanQadroModule(chnl);
+		switch (chnl) {
+		   case 0:			// row 1, 5, 9, 13 were clocked out
+			   LIGHT_DMD_ROW_01_05_09_13();
+			   break;
+		   case 1:			// row 2, 6, 10, 14 were clocked out
+			   LIGHT_DMD_ROW_02_06_10_14();
+			   break;
+		   case 2:			// row 3, 7, 11, 15 were clocked out
+			   LIGHT_DMD_ROW_03_07_11_15();
+			   break;
+		   case 3:			// row 4, 8, 12, 16 were clocked out
+			   LIGHT_DMD_ROW_04_08_12_16();
+			   break;
+		   }
 
-	OE_DMD_ROWS_OFF();
-	LATCH_DMD_SHIFT_REG_TO_OUTPUT();
+		OE_DMD_ROWS_ON();
 
-    switch (chnl) {
-       case 0:			// row 1, 5, 9, 13 were clocked out
-           LIGHT_DMD_ROW_01_05_09_13();
-           break;
-       case 1:			// row 2, 6, 10, 14 were clocked out
-           LIGHT_DMD_ROW_02_06_10_14();
-           break;
-       case 2:			// row 3, 7, 11, 15 were clocked out
-           LIGHT_DMD_ROW_03_07_11_15();
-           break;
-       case 3:			// row 4, 8, 12, 16 were clocked out
-           LIGHT_DMD_ROW_04_08_12_16();
-           break;
-       }
-
-	OE_DMD_ROWS_ON();
-
-	chnl++;
+		chnl++;
+		if(chnl>3) chnl = 0;
+	}
 }
 /**<
  * **************************************************************************
@@ -246,7 +262,7 @@ void dmdp10_Init()
 
 #if defined (__AVR_ATmega8__)
 
-		TCCR2 = 1<<CS22 | 1<<CS20;			//divide by 128
+		TCCR2 = 1<<CS21 | 1<<CS20;			//divide by 32
 		TIMSK = 1<<TOIE2;			//enable timer interrupt
 
 #else
@@ -254,5 +270,5 @@ void dmdp10_Init()
 		TIMSK2 = 1<<TOIE0;			//enable timer interrupt
 #endif
 
-
+		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 }

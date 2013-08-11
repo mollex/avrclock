@@ -46,11 +46,15 @@
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-inline unsigned char ds1307_getmin()
+unsigned char ds1307_getsec()
+{
+	return _DS1307.sec;
+}
+unsigned char ds1307_getmin()
 {
 	return _DS1307.min;
 }
-inline unsigned char ds1307_gethour()
+unsigned char ds1307_gethour()
 {
 	return _DS1307.hour;
 }
@@ -82,7 +86,7 @@ unsigned char ds1307_read(unsigned char addr)
 {
 	unsigned char val;
 	TWIM_Start(DS1307_ADDR, TW_WRITE);
-	TWIM_Write(0x00);
+	TWIM_Write(addr);
 	TWIM_Stop();
 
 	TWIM_Start(DS1307_ADDR, TW_READ);
@@ -138,7 +142,7 @@ void ds1307_update()
 {
   _DS1307.sec =  bcd2dec(ds1307_read(0));
   _DS1307.min =  bcd2dec(ds1307_read(1));
-  _DS1307.hour =  ds1307_read(3);
+  _DS1307.hour =  ds1307_read(2);
 
   if (_DS1307.hour & (1<<6))
 	 _DS1307.hour = (_DS1307.hour & 0xF) + (12 * ((_DS1307.hour & 0x20) >> 5));
@@ -155,6 +159,10 @@ void ds1307_update()
  ***************************************************************************/
 void ds1307_init()
 {
+	//DDRC &= ~((1<<4) | (1<<5));
+	//PORTC |=  (1<<4) | (1<<5);
 	// Initiate TWI Master with bitrate of 100000 Hz
 	TWIM_Init (100000);
+
+	ds1307_startstop(1);
 }

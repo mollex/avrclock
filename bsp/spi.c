@@ -33,7 +33,8 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-
+char spi_buff[4];
+int spi_count;
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************
@@ -44,7 +45,9 @@
  ***************************************************************************/
 ISR(SPI_STC_vect)
  {
-
+	if(spi_count == 8) return;
+	tx_print_usart("I  ");
+	SPDR = 3;
  }
 /**<
  * **************************************************************************
@@ -53,10 +56,11 @@ ISR(SPI_STC_vect)
  * @param 	b. 	char send value
  * @return  None.
  ***************************************************************************/
-/*void spi_send(char b)
+void spi_send(char b)
 {
+	spi_count = 0;
 	SPDR = b;
-}*/
+}
 /**<
  * **************************************************************************
  * @brief	Function send then get char by different interface
@@ -92,7 +96,8 @@ void spi_init()
 	  //   1     1     0    fosc/32
 	  //   1     1     1    fosc/64
 
-	SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD));// | (1<<SPIE) ); // enable SPI as master
+	//SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD) | (1<<SPIE) ); // enable SPI as master
+	SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD)  ); // enable SPI as master
 	SPCR &= ~( (1<<SPR1) | (1<<SPR0) );           // clear prescaler bits
 	//SPCR |= ( (1<<SPR1) | (1<<SPR0)  | (1<<CPOL));  // clear prescaler bits
 	SPSR |= (1<<SPI2X);

@@ -104,7 +104,11 @@ char Task_RC5()
 
 	if(rc5GetCmd(&rc5cmd))
 		{
-			switch(rc5cmd)
+
+		tx_print_usart("IR  ");
+		tx_hexprint_usart(&rc5cmd, 1);
+
+			/*switch(rc5cmd)
 				{
 					case IR_COM_0:
 					case IR_COM_1:
@@ -136,7 +140,7 @@ char Task_RC5()
 
 					default:
 						break;
-				}
+				}*/
 		}
 
 	return ret;
@@ -168,10 +172,13 @@ void Task_Main()
 	}
 
 }
-
+extern char spi_buff[4];
+extern int spi_count;
 int main(void) {
 
 	unsigned char i = 0;
+
+	_delay_ms(300);
 
 	uart_init();
 
@@ -180,25 +187,38 @@ int main(void) {
 
 	ds18x20_ReadTemp();
 	dmdp10_Init();
-	//ds1307_init();
-	rc5Init();
-	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+	GLClock_ShowTemp(55, 0);
+	ds1307_init();
+	//rc5Init();
 
+DDRC |= 0x01;
 	sei();
 	//GLClock_ShowClock(12, i++, 1);
-	GLClock_ShowTemp(55, 0);
+
 	while (1) {
 
 		tx_print_usart("C  ");
 		tx_hexprint_usart(&i, 1);
-		_delay_ms(500);
+		_delay_ms(300);
 
+		spi_send(1);
+		//spi_transfer(0);
+		/*ds1307_update();
+		tx_print_usart("H  ");
+		val = ds1307_gethour();
+		tx_hexprint_usart(&val, 1);
+		tx_print_usart("M  ");
+		val = ds1307_getmin();
+		tx_hexprint_usart(&val, 1);
+		tx_print_usart("S  ");
+		val = ds1307_getsec();
+		tx_hexprint_usart(&val, 1);*/
 
 		//Task_Temp();
-		_delay_ms(1500);
+		//Task_RC5();
+		//_delay_ms(1500);
 		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-		GLClock_ShowClock(88, 00, 1);
-
+		//GLClock_ShowClock(88, 00, 1);
 
 	}
 

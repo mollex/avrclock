@@ -151,8 +151,8 @@ void uart_init()
 	UCSRXA = _BV(U2X0); //Double speed mode USART0
 	baud_setting = (F_CPU / 4 / BAUD_RATE - 1) / 2;
 
-	UBRRXH = (baud_setting>>8);
-	UBRRXL = baud_setting;
+	UBRRXH = 0;//(baud_setting>>8);
+	UBRRXL = 34;//baud_setting;
 
 	//UCSRXA = 0; // clear error flags, disable U2X and MPCM
 
