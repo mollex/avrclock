@@ -293,7 +293,7 @@ unsigned char segmental_28ptBitmaps[]  =
 			0x7F, 0x1F, // ####### ######
 			0xFC, 0x0F, //  ############
 
-			// @468 '9' (15 pixels wide)
+		/*	// @468 '9' (15 pixels wide)
 			0xFC, 0x1F, //   ###########
 			0x7F, 0x3F, // ####### ######
 			0x07, 0x70, // ###         ###
@@ -347,7 +347,7 @@ unsigned char segmental_28ptBitmaps[]  =
 			0x07, 0x00, // ###
 			0x07, 0x00, // ###
 			0x7F, 0x1F, // ####### #####
-			0xFE, 0x3F, //  #############
+			0xFE, 0x3F, //  #############*/
 };
 
 // Character descriptors for Segmental 28pt

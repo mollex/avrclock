@@ -35,8 +35,8 @@
 #include <avr/delay.h>
 
 /************************** Constant Definitions ****************************/
-#define	RC5_PORT_SET	DDRC
-#define	RC5_PORT_IN		PINC
+#define	RC5_PORT_SET	DDRD
+#define	RC5_PORT_IN		PIND
 #define	RC5_PIN			PD3			// IR input low active
 
 #define	XTAL		16000000
@@ -71,7 +71,7 @@ uint8_t	rccount;				// bit value
  ***************************************************************************/
 ISR (TIMER0_OVF_vect)
 {
-//	PORTC++;
+	PORTC++;
 	uint16_t tmp = rc5_tmp;				// for faster access
 	char portin;
  // TCNT0 = -2;					// 2 * 256 = 512 cycle
@@ -114,7 +114,7 @@ void rc5Init()
 {
 
 	RC5_PORT_SET &=  ~(1<<RC5_PIN);
-	PORTC |= (1<<RC5_PIN);
+	PORTD |= (1<<RC5_PIN);
 
 
 #if defined (__AVR_ATmega8__)

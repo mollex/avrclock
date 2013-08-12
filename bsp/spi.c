@@ -26,6 +26,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/delay.h>
+
+#include "gl.h"
 /************************** Constant Definitions ****************************/
 
 /**************************** Type Definitions ******************************/
@@ -33,8 +35,10 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-char spi_buff[4];
-int spi_count;
+volatile char spi_dmdchannel;
+volatile char spi_dmdrow;
+volatile char spi_dmdi;
+volatile char spi_dmdj;
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************
@@ -45,9 +49,30 @@ int spi_count;
  ***************************************************************************/
 ISR(SPI_STC_vect)
  {
-	if(spi_count == 8) return;
-	tx_print_usart("I  ");
-	SPDR = 3;
+	//tx_print_usart("I  ");
+	//spi_buff[0] = SPDR;
+/*	if(spi_count <= 2)
+	{
+		SPDR = spi_count++;
+	}*/
+
+	if(spi_dmdj != 0x10)
+	{
+		spi_dmdrow -=4;
+		SPDR = ~_VideoBuf.vbuff[spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
+
+		if(spi_dmdrow == 0)
+		{
+			spi_dmdrow = 12+4;
+
+			if(++spi_dmdi > 7)
+			{
+				spi_dmdi = 0;
+				if(spi_dmdj == 0) spi_dmdj = 0x11;
+				spi_dmdj--;
+			}
+		}
+	}
  }
 /**<
  * **************************************************************************
@@ -58,8 +83,12 @@ ISR(SPI_STC_vect)
  ***************************************************************************/
 void spi_send(char b)
 {
-	spi_count = 0;
-	SPDR = b;
+	//SPDR = b;
+	spi_dmdchannel = b;
+	spi_dmdrow = 12;
+	spi_dmdi= 0;
+	spi_dmdj = 1;
+	SPDR = ~_VideoBuf.vbuff[spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
 }
 /**<
  * **************************************************************************
@@ -96,8 +125,8 @@ void spi_init()
 	  //   1     1     0    fosc/32
 	  //   1     1     1    fosc/64
 
-	//SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD) | (1<<SPIE) ); // enable SPI as master
-	SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD)  ); // enable SPI as master
+	SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD) | (1<<SPIE) ); // enable SPI as master
+	//SPCR |= ( (1<<SPE) | (1<<MSTR) | (1<<DORD)  ); // enable SPI as master
 	SPCR &= ~( (1<<SPR1) | (1<<SPR0) );           // clear prescaler bits
 	//SPCR |= ( (1<<SPR1) | (1<<SPR0)  | (1<<CPOL));  // clear prescaler bits
 	SPSR |= (1<<SPI2X);

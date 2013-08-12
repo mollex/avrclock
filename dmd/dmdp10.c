@@ -177,8 +177,6 @@ ISR (TIMER2_OVF_vect)
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-extern char spi_buff[4];
-extern int spi_count;
 char dmdp10_scanQadroModule(char chnl)
 {
 	static int j = 1;
@@ -196,11 +194,12 @@ char dmdp10_scanQadroModule(char chnl)
 			spi_transfer(~_VideoBuf.vbuff[j][i][4 + chnl]);
 			spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);*/
 
-			if(++i > 7)
+			if(++i > 16)
 			{
 				i = 0;
-
-				if(j-- <= 0){ j = 1; ret = 0;}
+				spi_send(1);
+				ret = 0;
+				//if(j-- <= 0){ j = 1; ret = 0;}
 			}
 
 
@@ -217,8 +216,7 @@ void dmdp10_Scan()
 {
 	static uint8_t chnl = 0;
 
-	if(dmdp10_scanQadroModule(chnl) == 0)
-	{
+
 		OE_DMD_ROWS_OFF();
 		LATCH_DMD_SHIFT_REG_TO_OUTPUT();
 
@@ -239,9 +237,12 @@ void dmdp10_Scan()
 
 		OE_DMD_ROWS_ON();
 
+
+
 		chnl++;
 		if(chnl>3) chnl = 0;
-	}
+		spi_send(chnl);
+
 }
 /**<
  * **************************************************************************
@@ -262,7 +263,7 @@ void dmdp10_Init()
 
 #if defined (__AVR_ATmega8__)
 
-		TCCR2 = 1<<CS21 | 1<<CS20;			//divide by 32
+		TCCR2 = 1<<CS21 | 1<<CS22;			//divide by 256
 		TIMSK = 1<<TOIE2;			//enable timer interrupt
 
 #else
