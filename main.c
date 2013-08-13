@@ -226,13 +226,13 @@ DDRC |= 0x01;
 
 
 
-		//Task_Temp();
-		//_delay_ms(1500);
+		Task_Temp();
+		_delay_ms(1500);
 		Task_RC5();
-		//Task_Clock();
-		//_delay_ms(1500);
+		Task_Clock();
+		_delay_ms(1500);
 		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-		GLClock_ShowClock(34, 11, 1);
+		GLClock_ShowClock(79, 00, 1);
 
 	}
 
