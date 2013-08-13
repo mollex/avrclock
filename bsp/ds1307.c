@@ -144,6 +144,11 @@ void ds1307_update()
   _DS1307.min =  bcd2dec(ds1307_read(1));
   _DS1307.hour =  ds1307_read(2);
 
+
+ /* tx_print_usart("H  "); tx_hexprint_usart(&_DS1307.hour, 1);
+  tx_print_usart("M  "); tx_hexprint_usart(&_DS1307.min, 1);
+  tx_print_usart("S  "); tx_hexprint_usart(&_DS1307.sec, 1);*/
+
   if (_DS1307.hour & (1<<6))
 	 _DS1307.hour = (_DS1307.hour & 0xF) + (12 * ((_DS1307.hour & 0x20) >> 5));
   else

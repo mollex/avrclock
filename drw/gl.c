@@ -51,7 +51,7 @@ Font_t Font[] =
 {
 	{
 		.heightPages = 2, //  Character height
-		.pt = 52,
+		.pt = 54,
 		.startChar = '0', //  Start character
 		.endChar = '9', //  End character
 		.spacePixels = 2, //  Width, in pixels, of space character
@@ -106,7 +106,7 @@ VideoBuf_t	_VideoBuf = {
  * @return None.
  *
  *****************************************************************************/
-void gl_setpixel(uint16_t x, uint16_t y, uint8_t val)
+void gl_setpixel(uint16_t x, uint16_t y, int val)
 {
 	if(x > _VideoBuf.xmax || y > _VideoBuf.ymax)	return;
 
@@ -168,26 +168,22 @@ void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
  *****************************************************************************/
 int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
 {
-	uint8_t i, j;
+	int i, j;
 	uint16_t val;
+	char b[2];
 	//if(ch < '0' || ch > '9') return 0;
 
 	int index = ch - '0';
 	for(j=0; j<font->pt; j+=font->heightPages)
 	{
-		//val = (font->dataPtr[font->charInfo[index].offset + j  + 0] << 8) | font->dataPtr[font->charInfo[index].offset + j  + 1];
-		//val =  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j +  i/8]));
-
+		val =  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j]));
 		for(i=0; i<font->charInfo[index].widthBits; i++)
 		{
-			gl_setpixel(x0+i, y0,  font->dataPtr[font->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
-
-			//gl_setpixel(x0+i, y0, val & (1<<(i)));
-
+			//gl_setpixel(x0+i, y0,  font->dataPtr[font->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
+			gl_setpixel(x0+i, y0, val & (1<<(i)));
 		}
 		y0++;
 	}
-
 	return (i + font->spacePixels);
 }
 /****************************************************************************/

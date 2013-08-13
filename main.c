@@ -88,19 +88,22 @@ void Task_Temp()
 
 void Task_Clock()
 {
-	char min, hour;
+	unsigned char min, hour;
 
 	ds1307_update();
-	val = ds1307_gethour();
-	val = ds1307_getmin();
+	hour = ds1307_gethour();
+	min = ds1307_getmin();
 
 	tx_print_usart("H  "); tx_hexprint_usart(&hour, 1);
 	tx_print_usart("M  "); tx_hexprint_usart(&min, 1);
 
+	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 	GLClock_ShowClock(hour, min , 1);
-	_delay_ms(300);
+	_delay_ms(500);
 	GLClock_ShowClock(hour, min , 0);
-	_delay_ms(300);
+	_delay_ms(500);
+	GLClock_ShowClock(hour, min , 1);
+	_delay_ms(500);
 
 }
 
@@ -194,13 +197,15 @@ int main(void) {
 	_delay_ms(300);
 
 	uart_init();
+/*	GL_DrawChar(&Font[0], 0 , 0, '0');
 
+return;*/
 	//DEBUG_PRINTF("begin \n\r");
 	//DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
 	ds18x20_ReadTemp();
-	//dmdp10_Init();
-	GLClock_ShowTemp(55, 0);
+	dmdp10_Init();
+	//GLClock_ShowTemp(01, 0);
 	ds1307_init();
 	rc5Init();
 
@@ -215,18 +220,19 @@ DDRC |= 0x01;
 
 		tx_print_usart("C  ");
 		tx_hexprint_usart(&i, 1);
-		_delay_ms(300);
+		_delay_ms(500);
 		//memset(_VideoBuf.vbuff, (1<<(i++&0x7)), sizeof(_VideoBuf.vbuff));
 		//spi_send(1);
 
 
 
-		Task_Temp();
+		//Task_Temp();
+		//_delay_ms(1500);
 		Task_RC5();
-		Task_Clock();
+		//Task_Clock();
 		//_delay_ms(1500);
 		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-		//GLClock_ShowClock(88, i++, 1);
+		GLClock_ShowClock(34, 11, 1);
 
 	}
 
