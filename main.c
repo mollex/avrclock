@@ -88,7 +88,20 @@ void Task_Temp()
 
 void Task_Clock()
 {
-	//ds1307_startstop(1);
+	char min, hour;
+
+	ds1307_update();
+	val = ds1307_gethour();
+	val = ds1307_getmin();
+
+	tx_print_usart("H  "); tx_hexprint_usart(&hour, 1);
+	tx_print_usart("M  "); tx_hexprint_usart(&min, 1);
+
+	GLClock_ShowClock(hour, min , 1);
+	_delay_ms(300);
+	GLClock_ShowClock(hour, min , 0);
+	_delay_ms(300);
+
 }
 
 #define GSC_CMD_ENTERMENU	0xF0
@@ -206,23 +219,14 @@ DDRC |= 0x01;
 		//memset(_VideoBuf.vbuff, (1<<(i++&0x7)), sizeof(_VideoBuf.vbuff));
 		//spi_send(1);
 
-		//spi_transfer(0);
-		/*ds1307_update();
-		tx_print_usart("H  ");
-		val = ds1307_gethour();
-		tx_hexprint_usart(&val, 1);
-		tx_print_usart("M  ");
-		val = ds1307_getmin();
-		tx_hexprint_usart(&val, 1);
-		tx_print_usart("S  ");
-		val = ds1307_getsec();
-		tx_hexprint_usart(&val, 1);*/
+
 
 		Task_Temp();
 		Task_RC5();
+		Task_Clock();
 		//_delay_ms(1500);
 		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-		GLClock_ShowClock(88, i++, 1);
+		//GLClock_ShowClock(88, i++, 1);
 
 	}
 

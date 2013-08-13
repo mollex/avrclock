@@ -169,16 +169,21 @@ void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
 int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
 {
 	uint8_t i, j;
-
+	uint16_t val;
 	//if(ch < '0' || ch > '9') return 0;
 
 	int index = ch - '0';
 	for(j=0; j<font->pt; j+=font->heightPages)
 	{
+		//val = (font->dataPtr[font->charInfo[index].offset + j  + 0] << 8) | font->dataPtr[font->charInfo[index].offset + j  + 1];
+		//val =  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j +  i/8]));
+
 		for(i=0; i<font->charInfo[index].widthBits; i++)
 		{
 			gl_setpixel(x0+i, y0,  font->dataPtr[font->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
-			//gl_setpixel(x0+i, y0,  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j +  i/8])) & (1<<(i%8)));
+
+			//gl_setpixel(x0+i, y0, val & (1<<(i)));
+
 		}
 		y0++;
 	}
