@@ -237,12 +237,10 @@ void GLClock_SetMinutes(Font_t *font, char val)
 
 void GLClock_SetDots(char val)
 {
-	gl_setpixel(31, 8,  val);
-	gl_setpixel(31, 9,  val);
-	gl_setpixel(31, 10,  val);
-	gl_setpixel(32, 10,  val);
-	gl_setpixel(32, 8,  val);
-	gl_setpixel(32, 9,  val);
+	GL_DrawLine(31, 8, 31, 10, val);
+	GL_DrawLine(32, 8, 32, 10, val);
+	GL_DrawLine(31, 21, 31, 23, val);
+	GL_DrawLine(32, 21, 32, 23, val);
 }
 void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 {

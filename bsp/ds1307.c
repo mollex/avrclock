@@ -167,7 +167,7 @@ void ds1307_init()
 	//DDRC &= ~((1<<4) | (1<<5));
 	//PORTC |=  (1<<4) | (1<<5);
 	// Initiate TWI Master with bitrate of 100000 Hz
-	TWIM_Init (100000);
+	TWIM_Init (50000);
 
 	ds1307_startstop(1);
 }

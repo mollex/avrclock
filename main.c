@@ -61,8 +61,8 @@ extern void dmdp10_Init();
 
 
 extern Font_t Font[];
-char val = 0;
-//int val2 = 0;
+char _val = 0;
+char _count = 0;
 
 extern void GLClock_ShowTemp(unsigned char val, unsigned char sign);
 extern void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot);
@@ -75,36 +75,89 @@ extern void rc5Init();
 extern unsigned char  rc5GetCmd(unsigned char  *outPtr);
 
 
-void Task_Temp()
+char Task_Temp()
 {
-	ds18x20_ReadTemp();
-	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-	GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign);
-	val = ds18x20_GetHight();
-	tx_print_usart("T  ");
-			tx_hexprint_usart(&val, 1);
-	//DEBUG_PRINTF("\n\r Temp %d.%d", ds18x20_GetHight(), ds18x20_GetLow());
+	static char state = 0;
+
+	tx_print_usart("state ");	tx_hexprint_usart(&state, 1);
+
+	switch(state)
+	{
+		case 0:
+			state++;
+			break;
+		case 1:
+			state++;
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign);
+			_val = ds18x20_GetHight();
+			tx_print_usart("T  ");	tx_hexprint_usart(&_val, 1);
+			break;
+		case 2:
+			if(_count > 15)
+			{
+				state++;
+			}
+			break;
+		case 3:
+			ds18x20_ReadTemp();
+			state++;
+			break;
+		default:
+			state = 0;
+			break;
+	}
+	return state;
 }
 
-void Task_Clock()
+char Task_Clock()
 {
-	unsigned char min, hour;
+	static unsigned char hour;
+	static unsigned char min;
+	static char state = 0;
+	static char timeshow= 0;
 
-	ds1307_update();
-	hour = ds1307_gethour();
-	min = ds1307_getmin();
+	switch(state)
+	{
+		case 0:
+			state++;
+			break;
+		case 1:
+			ds1307_update();
+			hour = ds1307_gethour();
+			min = ds1307_getmin();
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_ShowClock(hour, min , 1);
 
-	tx_print_usart("H  "); tx_hexprint_usart(&hour, 1);
-	tx_print_usart("M  "); tx_hexprint_usart(&min, 1);
-
-	memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-	GLClock_ShowClock(hour, min , 1);
-	_delay_ms(500);
-	GLClock_ShowClock(hour, min , 0);
-	_delay_ms(500);
-	GLClock_ShowClock(hour, min , 1);
-	_delay_ms(500);
-
+			_count = 0;
+			timeshow= 0;
+			state++;
+			//tx_print_usart("H  "); tx_hexprint_usart(&hour, 1);
+			//tx_print_usart("M  "); tx_hexprint_usart(&min, 1);
+			break;
+		case 2:
+			if(_count > 5)
+			{
+				GLClock_ShowClock(hour, min , 0);
+				state = 3;
+				_count = 0;
+				if(timeshow++ > 10)state = 0xFF;
+			}
+			break;
+		case 3:
+			if(_count > 5)
+			{
+				GLClock_ShowClock(hour, min , 1);
+				state = 2;
+				_count = 0;
+				if(timeshow++ > 10)state = 0xFF;
+			}
+			break;
+		default:
+			state = 0;
+			break;
+	}
+	return state;
 }
 
 #define GSC_CMD_ENTERMENU	0xF0
@@ -167,29 +220,27 @@ void Task_Main()
 	static char state = 0;
 	static char cmd = 0;
 
-	cmd  = Task_RC5();
+	/*cmd  = Task_RC5();
 	if(cmd == GSC_CMD_ENTERMENU)
 	{
 		state = 1;
-	}
+	}*/
 
 	switch(state)
 	{
 		case 0:
-
+			if(Task_Temp() == 0) state++;
 			break;
 		case 1:
-
+			if(Task_Clock() == 0) state++;
 			break;
-
 		default:
-
+			state = 0;
 			break;
 	}
 
 }
-extern char spi_buff[4];
-extern int spi_count;
+
 int main(void) {
 
 	unsigned char i = 0;
@@ -197,43 +248,29 @@ int main(void) {
 	_delay_ms(300);
 
 	uart_init();
-/*	GL_DrawChar(&Font[0], 0 , 0, '0');
-
-return;*/
-	//DEBUG_PRINTF("begin \n\r");
-	//DEBUG_PRINTF_SOFT("begin 2 \n\r");
 
 	ds18x20_ReadTemp();
 	dmdp10_Init();
-	//GLClock_ShowTemp(01, 0);
 	ds1307_init();
 	rc5Init();
 
-DDRC |= 0x01;
 	sei();
-	//GLClock_ShowClock(12, i++, 1);
 
-	/*gl_setpixel(1, 1,  1);
-	GL_DrawLine(0, 0, 64, 0, 1);
-	GL_DrawLine(0, 16, 64, 16, 1);*/
 	while (1) {
 
-		tx_print_usart("C  ");
-		tx_hexprint_usart(&i, 1);
-		_delay_ms(500);
-		//memset(_VideoBuf.vbuff, (1<<(i++&0x7)), sizeof(_VideoBuf.vbuff));
-		//spi_send(1);
+		_count++;
 
+		tx_print_usart("C  ");	tx_hexprint_usart(&i, 1);
+		_delay_ms(100);
 
-
-		Task_Temp();
-		_delay_ms(1500);
-		Task_RC5();
-		Task_Clock();
-		_delay_ms(1500);
+		//Task_Temp();
+		//_delay_ms(1500);
+		//Task_RC5();
+		//Task_Clock();
 		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-		GLClock_ShowClock(79, 00, 1);
+		//GLClock_ShowClock(79, 00, 1);
 
+		Task_Main();
 	}
 
 }

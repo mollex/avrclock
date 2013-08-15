@@ -71,7 +71,7 @@ uint8_t	rccount;				// bit value
  ***************************************************************************/
 ISR (TIMER0_OVF_vect)
 {
-	PORTC++;
+	//PORTC++;
 	uint16_t tmp = rc5_tmp;				// for faster access
 	char portin;
  // TCNT0 = -2;					// 2 * 256 = 512 cycle
