@@ -138,20 +138,12 @@ char Task_Clock()
 		case 2:
 			if(_count > 5)
 			{
-				GLClock_ShowClock(hour, min , 0);
-				state = 3;
 				_count = 0;
+				GLClock_SetDots(timeshow & 0x01);
 				if(timeshow++ > 10)state = 0xFF;
 			}
 			break;
 		case 3:
-			if(_count > 5)
-			{
-				GLClock_ShowClock(hour, min , 1);
-				state = 2;
-				_count = 0;
-				if(timeshow++ > 10)state = 0xFF;
-			}
 			break;
 		default:
 			state = 0;
