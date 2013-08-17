@@ -47,7 +47,7 @@ extern  FontChar_t segmental_28ptDescriptors[];
 extern  unsigned char segmental_28ptBitmaps[];
 
 // Font information for Courier New 8pt
-Font_t Font[] =
+Font_t _Font[] =
 {
 	{
 		.heightPages = 2, //  Character height
@@ -166,25 +166,26 @@ void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
  * @return None.
  *
  *****************************************************************************/
-int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
+int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, uint16_t ch)
 {
-	int i, j;
+	int j, i=0;
 	uint16_t val;
-	char b[2];
+	Font_t *fontPtr = &_Font[font];
+
 	//if(ch < '0' || ch > '9') return 0;
 
 	int index = ch - '0';
-	for(j=0; j<font->pt; j+=font->heightPages)
+	for(j=0; j<fontPtr->pt; j+=fontPtr->heightPages)
 	{
-		val =  pgm_read_word(&(font->dataPtr[font->charInfo[index].offset + j]));
-		for(i=0; i<font->charInfo[index].widthBits; i++)
+		val =  pgm_read_word(&(fontPtr->dataPtr[fontPtr->charInfo[index].offset + j]));
+		for(i=0; i<fontPtr->charInfo[index].widthBits; i++)
 		{
-			//gl_setpixel(x0+i, y0,  font->dataPtr[font->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
+			//gl_setpixel(x0+i, y0,  fontPtr->dataPtr[fontPtr->charInfo[index].offset + j +  i/8] & (1<<(i%8)));
 			gl_setpixel(x0+i, y0, val & (1<<(i)));
 		}
 		y0++;
 	}
-	return (i + font->spacePixels);
+	return (i + fontPtr->spacePixels);
 }
 /****************************************************************************/
 /**
@@ -195,10 +196,10 @@ int GL_DrawChar(Font_t *font, uint16_t x0, uint16_t y0, uint16_t ch)
  * @return None.
  *
  *****************************************************************************/
-void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour)
+void GL_DrawNumber(unsigned char font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour)
 {
 	uint8_t buffer[8] = {0};
-	sprintf(buffer, "%04d", (int)(num & 0x1FFFF));
+	//sprintf(buffer, "%04d", (int)(num & 0x1FFFF));
 
 	uint8_t t, i=0;
 	do{
@@ -216,7 +217,7 @@ void GL_DrawNumber(Font_t *font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t
  * @return None.
  *
  *****************************************************************************/
-void GLClock_SetHour(Font_t *font, char val)
+void GLClock_SetHour(unsigned char font, char val)
 {
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
@@ -226,7 +227,7 @@ void GLClock_SetHour(Font_t *font, char val)
 
 }
 
-void GLClock_SetMinutes(Font_t *font, char val)
+void GLClock_SetMinutes(unsigned char font, char val)
 {
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
@@ -244,8 +245,8 @@ void GLClock_SetDots(char val)
 }
 void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 {
-	GLClock_SetHour(&Font[0], hour);
-	GLClock_SetMinutes(&Font[0], min);
+	GLClock_SetHour(GL_FONT_SEGMENTAL28, hour);
+	GLClock_SetMinutes(GL_FONT_SEGMENTAL28, min);
 	GLClock_SetDots(dot);
 }
 /****************************************************************************/
@@ -257,7 +258,7 @@ void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
  * @return None.
  *
  *****************************************************************************/
-void GLClock_SetTemp(Font_t *font, unsigned char val, unsigned char sign)
+void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
 {
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
@@ -284,5 +285,5 @@ void GLClock_SetTemp(Font_t *font, unsigned char val, unsigned char sign)
 
 void GLClock_ShowTemp(unsigned char val, unsigned char sign)
 {
-	 GLClock_SetTemp(&Font[0], val, sign);
+	 GLClock_SetTemp(GL_FONT_SEGMENTAL28, val, sign);
 }

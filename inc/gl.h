@@ -25,6 +25,8 @@
 /***************************** Include Files *******************************/
 #include <stdint.h>
 /************************** Constant Definitions ****************************/
+#define GL_FONT_SEGMENTAL28	0
+
 #define VBUFF_X_MAX		64
 #define VBUFF_Y_MAX		32
 
@@ -49,6 +51,8 @@ VideoBuf_t	_VideoBuf;
 
 /************************** Function Prototypes *****************************/
 
-
+void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot);
+void GLClock_ShowTemp(unsigned char val, unsigned char sign);
+void GLClock_SetDots(char val);
 
 #endif /* GL_H_ */

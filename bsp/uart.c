@@ -86,12 +86,12 @@ void uart_putch(char ch);
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-
+/*
 ISR(USART_RX_vect)
  {
 
  }
-
+*/
 /**<
  * **************************************************************************
  * @brief	Function send char by different interface
@@ -167,7 +167,7 @@ void tx_print_usart(char *s)
 	}
 }
 
-void tx_hexprint_usart(char *s, char len)
+void tx_hexprint_usart(unsigned char *s, char len)
 {
 	char b[6] = {'0', 'x', 'q','q', ' ', 0};
 	register char r1 = 0;
@@ -179,7 +179,7 @@ void tx_hexprint_usart(char *s, char len)
 		r2 &= 0x0F;
 		b[2] = r1 + ((r1>9) ? 0x57 : 0x30);
  		b[3] = r2 + ((r2>9) ? 0x57 : 0x30);
- 		tx_print_usart(b);
+ 		tx_print_usart((char)b);
 	}
 	tx_print_usart(" \n\r");
 }
