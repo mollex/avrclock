@@ -326,9 +326,9 @@ void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
 
-	GL_DrawChar(font, 11, 3, hight);
-	GL_DrawChar(font, 28, 3, low);
-	GL_DrawChar(font, 50, 3, 'C');
+	GL_DrawChar(font, 11, 2, hight);
+	GL_DrawChar(font, 28, 2, low);
+	GL_DrawChar(font, 50, 2, 'C');
 
 	GL_DrawLine(45, 3, 47, 3, 1);
 	GL_DrawLine(45, 8, 47, 8, 1);

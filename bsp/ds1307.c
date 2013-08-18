@@ -3,7 +3,7 @@
 * ds1307.c
 *
 *  Created on: 25.07.2013
-*      Author: Admin
+*      Author: mollex
 *
 * MODIFICATION HISTORY:
 *
@@ -151,9 +151,13 @@ void ds1307_setTime(unsigned char hour, unsigned char min)
 {
 	if ((hour<24) && (min<60))
 	{
+		_DS1307.sec =  0;
+		_DS1307.min =  min;
+		_DS1307.hour = hour;
+
 		ds1307_write(DS1307_REG_SEC, 0);
-		ds1307_write(DS1307_REG_MIN, dec2bcd(min));
-		ds1307_write(DS1307_REG_HOUR, dec2bcd(hour));
+		ds1307_write(DS1307_REG_MIN, dec2bcd(_DS1307.min));
+		ds1307_write(DS1307_REG_HOUR, dec2bcd(_DS1307.hour));
 	}
 }
 /**<
@@ -169,9 +173,9 @@ void ds1307_update()
   _DS1307.min =  bcd2dec(ds1307_read(DS1307_REG_MIN));
   _DS1307.hour =  ds1307_read(DS1307_REG_HOUR);
 
-  tx_print_usart("H  "); tx_hexprint_usart(&_DS1307.hour, 1);
+ /* tx_print_usart("H  "); tx_hexprint_usart(&_DS1307.hour, 1);
   tx_print_usart("M  "); tx_hexprint_usart(&_DS1307.min, 1);
-  tx_print_usart("S  "); tx_hexprint_usart(&_DS1307.sec, 1);
+  tx_print_usart("S  "); tx_hexprint_usart(&_DS1307.sec, 1);*/
 
   if (_DS1307.hour & (1<<6))
 	 _DS1307.hour = (_DS1307.hour & 0xF) + (12 * ((_DS1307.hour & 0x20) >> 5));
@@ -188,8 +192,6 @@ void ds1307_update()
  ***************************************************************************/
 void ds1307_init()
 {
-	//DDRC &= ~((1<<4) | (1<<5));
-	//PORTC |=  (1<<4) | (1<<5);
 	// Initiate TWI Master with bitrate of 100000 Hz
 	TWIM_Init (50000);
 

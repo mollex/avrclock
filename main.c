@@ -87,10 +87,8 @@ char Task_Clock()
 			break;
 		case 1:
 			ds1307_update();
-			hour = ds1307_gethour();
-			min = ds1307_getmin();
 			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_ShowClock(hour, min , 1);
+			GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , 1);
 
 			_count = 0;
 			timeshow= 0;
@@ -125,7 +123,7 @@ void Task_Main()
 		isrc5 = 1;
 		if(rc5cmd == IR_COM_VSD_MENU)
 		{
-			state = 2;
+			state = 0xF0;
 
 		}else if(rc5cmd == IR_COM_ESC)
 		{
@@ -133,21 +131,26 @@ void Task_Main()
 		}
 	}
 
+
 	switch(state)
 	{
 		case 0:
-
 			if(Task_Clock() == 0) state++;
 			break;
 		case 1:
-			if(Task_Temp() == 0) state+=0xF0;
+			if(Task_Temp() == 0) state++;
 			break;
-		case 2:
+
+		case 0xF0:
 			if(isrc5)
 			{
 				memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 
-				if(GLClock_SetClockSetting(rc5cmd)==0){state+=0xF0; _delay_ms(500);}
+				if(GLClock_SetClockSetting(rc5cmd)==0){
+					state++;
+					GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , 1);
+					_count = 0;
+				}
 			}
 
 			break;
@@ -162,6 +165,7 @@ int main(void) {
 	_delay_ms(300);
 
 	uart_init();
+	ds18x20_ReadTemp();
 	ds18x20_ReadTemp();
 	dmdp10_Init();
 	ds1307_init();
