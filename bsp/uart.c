@@ -179,7 +179,7 @@ void tx_hexprint_usart(unsigned char *s, char len)
 		r2 &= 0x0F;
 		b[2] = r1 + ((r1>9) ? 0x57 : 0x30);
  		b[3] = r2 + ((r2>9) ? 0x57 : 0x30);
- 		tx_print_usart((char)b);
+ 		tx_print_usart((char*)b);
 	}
 	tx_print_usart(" \n\r");
 }

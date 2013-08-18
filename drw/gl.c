@@ -36,6 +36,7 @@
 
 #include "font.h"
 #include "gl.h"
+#include "rc5.h"
 /************************** Constant Definitions ****************************/
 
 /**************************** Type Definitions ******************************/
@@ -70,6 +71,7 @@ VideoBuf_t	_VideoBuf = {
 
 };
 /************************* Function Prototypes *****************************/
+extern void ds1307_setTime(unsigned char hour, unsigned char min);
 /****************************************************************************/
 /**
  * @brief	 	Функция
@@ -222,8 +224,8 @@ void GLClock_SetHour(unsigned char font, char val)
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
 
-	GL_DrawChar(font, 0, 3, hight);
-	GL_DrawChar(font, 16, 3, low);
+	GL_DrawChar(font, 0, 2, hight);
+	GL_DrawChar(font, 16, 2, low);
 
 }
 
@@ -232,8 +234,8 @@ void GLClock_SetMinutes(unsigned char font, char val)
 	char hight = val/10 + '0';
 	char low = val%10 + '0';
 
-	GL_DrawChar(font, 34, 3, hight);
-	GL_DrawChar(font, 50, 3, low);
+	GL_DrawChar(font, 34, 2, hight);
+	GL_DrawChar(font, 50, 2, low);
 }
 
 void GLClock_SetDots(char val)
@@ -248,6 +250,67 @@ void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 	GLClock_SetHour(GL_FONT_SEGMENTAL28, hour);
 	GLClock_SetMinutes(GL_FONT_SEGMENTAL28, min);
 	GLClock_SetDots(dot);
+}
+void GLClock_SetCursor(unsigned int x0, unsigned int y0)
+{
+	GL_DrawLine(x0, y0+2, x0 + 12, y0+2, 1);
+	GL_DrawLine(x0+2, y0+1, x0 + 10, y0+1, 1);
+	GL_DrawLine(x0+4, y0, x0 + 8, y0, 1);
+	GL_DrawLine(x0+5, y0, x0 + 7, y0, 1);
+}
+char GLClock_SetClockSetting(unsigned char cmd)
+{
+	static unsigned char val[4];
+	static int indx;
+	char ret = 1;
+
+	if(cmd == IR_COM_VSD_MENU)
+	{
+		val[0] = val[1] = val[2] = val[3] = 0xFF;
+		indx = 0;
+	}
+	else
+	{
+		if(indx == 0)
+		{
+			if(cmd <= 2) val[indx++] = cmd;
+		}
+		else if(indx == 1)
+		{
+			if(val[0] == 2)
+			{
+				if(cmd <= 3) val[indx++] = cmd;
+			}else
+			{
+				if(cmd <= 9) val[indx++] = cmd;
+			}
+		}
+		else if(indx == 2)
+		{
+			if(cmd <= 5) val[indx++] = cmd;
+		}
+		else if(indx == 3)
+		{
+			if(cmd <= 9) val[indx++] = cmd;
+			ret = 0;
+
+			val[0] = val[0] * 10 + val[1];
+			val[2] = val[2] * 10 + val[3];
+			ds1307_setTime(val[0], val[2]);
+		}
+		else if(indx > 3)
+		{
+			ret = 0;
+		}
+	}
+
+	GLClock_SetDots(1);
+	if(val[0] == 0xFF)GLClock_SetCursor(1,27); else GL_DrawChar(GL_FONT_SEGMENTAL28, 0, 2, val[0] + '0');
+	if(val[1] == 0xFF)GLClock_SetCursor(17,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 16, 2, val[1] + '0');
+	if(val[2] == 0xFF)GLClock_SetCursor(33,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 34, 2, val[2] + '0');
+	if(val[3] == 0xFF)GLClock_SetCursor(51,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 50, 2, val[3] + '0');
+
+	return ret;
 }
 /****************************************************************************/
 /**
@@ -267,16 +330,14 @@ void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
 	GL_DrawChar(font, 28, 3, low);
 	GL_DrawChar(font, 50, 3, 'C');
 
-
-	GL_DrawLine(44, 3, 48, 3, 1);
-	GL_DrawLine(44, 8, 48, 8, 1);
-	GL_DrawLine(44, 3, 44, 8, 1);
-	GL_DrawLine(48, 3, 48, 8, 1);
-
+	GL_DrawLine(45, 3, 47, 3, 1);
+	GL_DrawLine(45, 8, 47, 8, 1);
+	GL_DrawLine(44, 4, 44, 7, 1);
+	GL_DrawLine(48, 4, 48, 7, 1);
 
 	GL_DrawLine(0, 15, 9, 15, 1);
 	GL_DrawLine(0, 16, 9, 16, 1);
-	if(sign)
+	if(sign == 0)
 	{
 		GL_DrawLine(4, 11, 4, 20, 1);
 		GL_DrawLine(5, 11, 5, 20, 1);

@@ -24,6 +24,15 @@
 #include "i2c.h"
 /************************** Constant Definitions ****************************/
 #define DS1307_ADDR (0x68<<1)
+
+#define DS1307_REG_SEC		0
+#define DS1307_REG_MIN		1
+#define DS1307_REG_HOUR		2
+#define DS1307_REG_DOW		3
+#define DS1307_REG_DATE		4
+#define DS1307_REG_MON		5
+#define DS1307_REG_YEAR		6
+#define DS1307_REG_CON		7
 /**************************** Type Definitions ******************************/
 	typedef struct
 	{
@@ -121,15 +130,31 @@ void ds1307_startstop(char bit)
 {
   uint8_t sec;
 
-  sec =  ds1307_read(0);
+  sec =  ds1307_read(DS1307_REG_SEC);
 
   if(bit)
   {
-	  ds1307_write(0, sec & 0x7F);
+	  ds1307_write(DS1307_REG_SEC, sec & 0x7F);
   }else
   {
-	  ds1307_write(0, sec | 0x80); //hold
+	  ds1307_write(DS1307_REG_SEC, sec | 0x80); //hold
   }
+}
+/**<
+ * **************************************************************************
+ * @brief	Function
+ *
+ * @param 	b.
+ * @return  none
+ ***************************************************************************/
+void ds1307_setTime(unsigned char hour, unsigned char min)
+{
+	if ((hour<24) && (min<60))
+	{
+		ds1307_write(DS1307_REG_SEC, 0);
+		ds1307_write(DS1307_REG_MIN, dec2bcd(min));
+		ds1307_write(DS1307_REG_HOUR, dec2bcd(hour));
+	}
 }
 /**<
  * **************************************************************************
@@ -140,14 +165,13 @@ void ds1307_startstop(char bit)
  ***************************************************************************/
 void ds1307_update()
 {
-  _DS1307.sec =  bcd2dec(ds1307_read(0));
-  _DS1307.min =  bcd2dec(ds1307_read(1));
-  _DS1307.hour =  ds1307_read(2);
+  _DS1307.sec =  bcd2dec(ds1307_read(DS1307_REG_SEC));
+  _DS1307.min =  bcd2dec(ds1307_read(DS1307_REG_MIN));
+  _DS1307.hour =  ds1307_read(DS1307_REG_HOUR);
 
-
- /* tx_print_usart("H  "); tx_hexprint_usart(&_DS1307.hour, 1);
+  tx_print_usart("H  "); tx_hexprint_usart(&_DS1307.hour, 1);
   tx_print_usart("M  "); tx_hexprint_usart(&_DS1307.min, 1);
-  tx_print_usart("S  "); tx_hexprint_usart(&_DS1307.sec, 1);*/
+  tx_print_usart("S  "); tx_hexprint_usart(&_DS1307.sec, 1);
 
   if (_DS1307.hour & (1<<6))
 	 _DS1307.hour = (_DS1307.hour & 0xF) + (12 * ((_DS1307.hour & 0x20) >> 5));

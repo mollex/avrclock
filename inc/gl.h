@@ -54,5 +54,6 @@ VideoBuf_t	_VideoBuf;
 void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot);
 void GLClock_ShowTemp(unsigned char val, unsigned char sign);
 void GLClock_SetDots(char val);
+char GLClock_SetClockSetting(unsigned char cmd);
 
 #endif /* GL_H_ */
