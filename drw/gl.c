@@ -47,6 +47,9 @@
 extern  FontChar_t segmental_28ptDescriptors[];
 extern  unsigned char segmental_28ptBitmaps[];
 
+extern  FontChar_t segoeCondensed_14ptDescriptors[];
+extern  unsigned char segoeCondensed_14ptBitmaps[];
+
 // Font information for Courier New 8pt
 Font_t _Font[] =
 {
@@ -58,6 +61,15 @@ Font_t _Font[] =
 		.spacePixels = 2, //  Width, in pixels, of space character
 		.charInfo = segmental_28ptDescriptors, //  Character descriptor array
 		.dataPtr = segmental_28ptBitmaps, //  Character bitmap array
+	},
+	{
+		.heightPages = 2, //  Character height
+		.pt = 54,
+		.startChar = '0', //  Start character
+		.endChar = '9', //  End character
+		.spacePixels = 1, //  Width, in pixels, of space character
+		.charInfo = segoeCondensed_14ptDescriptors, //  Character descriptor array
+		.dataPtr = segoeCondensed_14ptBitmaps, //  Character bitmap array
 	},
 };
 
@@ -168,15 +180,17 @@ void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
  * @return None.
  *
  *****************************************************************************/
-int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, uint16_t ch)
+int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, char ch)
 {
 	int j, i=0;
 	uint16_t val;
 	Font_t *fontPtr = &_Font[font];
 
-	//if(ch < '0' || ch > '9') return 0;
-
 	int index = ch - '0';
+
+	fontPtr->heightPages = fontPtr->charInfo[index].widthBits / 8 + 1; // height symbol 1 or more byte
+	fontPtr->pt = fontPtr->charInfo[index+1].offset - fontPtr->charInfo[index].offset; //size of bytes symbols
+
 	for(j=0; j<fontPtr->pt; j+=fontPtr->heightPages)
 	{
 		val =  pgm_read_word(&(fontPtr->dataPtr[fontPtr->charInfo[index].offset + j]));
@@ -194,21 +208,34 @@ int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, uint16_t ch)
  * @brief	 	‘ункци€
  *
  * @param None 	јргумент
+ *				русские верхний регистр от 0xC0 ... 0xDF
+ *				русские нижний регистр от 0xe0...0xFF
+ * @return None.
+ *
+ *****************************************************************************/
+void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
+{
+	tx_print_usart("\n\r Str  ");
+	char b;
+	do{
+		b = *str - 0x90 + 10;
+		x0 += GL_DrawChar(font, x0, y0, b);
+		tx_hexprint_usart(&b, 1);
+	}
+	while(*str++);
+}
+/****************************************************************************/
+/**
+ * @brief	 	‘ункци€
+ *
+ * @param None 	јргумент
  *
  * @return None.
  *
  *****************************************************************************/
-void GL_DrawNumber(unsigned char font, uint16_t x0, uint16_t y0, uint32_t num, uint8_t colour)
+void GLClock_Phrase1()
 {
-	uint8_t buffer[8] = {0};
-	//sprintf(buffer, "%04d", (int)(num & 0x1FFFF));
-
-	uint8_t t, i=0;
-	do{
-		t = buffer[i++];
-		x0 += GL_DrawChar(font, x0, y0, t);
-	}
-	while(t);
+	GL_DrawStr(GL_FONT_SEGOE14, 0, 0, "јЅ¬√ƒя");
 }
 /****************************************************************************/
 /**

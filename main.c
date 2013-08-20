@@ -165,18 +165,18 @@ int main(void) {
 	_delay_ms(300);
 
 	uart_init();
-	ds18x20_ReadTemp();
-	ds18x20_ReadTemp();
 	dmdp10_Init();
 	ds1307_init();
+	ds18x20_ReadTemp();
+	ds18x20_ReadTemp();
 	rc5Init();
 
 	sei();
-
+	GLClock_Phrase1();
 	while (1) {
 
 		_count++;
-
+		//_count = 'Á';
 		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&_count, 1);
 
 		_delay_ms(100);

@@ -25,7 +25,8 @@
 /***************************** Include Files *******************************/
 #include <stdint.h>
 /************************** Constant Definitions ****************************/
-#define GL_FONT_SEGMENTAL28	0
+#define GL_FONT_SEGMENTAL28		0
+#define GL_FONT_SEGOE14			1
 
 #define VBUFF_X_MAX		64
 #define VBUFF_Y_MAX		32
