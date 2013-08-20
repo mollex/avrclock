@@ -188,7 +188,7 @@ int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, char ch)
 
 	int index = ch - '0';
 
-	fontPtr->heightPages = fontPtr->charInfo[index].widthBits / 8 + 1; // height symbol 1 or more byte
+	fontPtr->heightPages = (fontPtr->charInfo[index].widthBits - 1)/ 8 + 1; // height symbol 1 or more byte
 	fontPtr->pt = fontPtr->charInfo[index+1].offset - fontPtr->charInfo[index].offset; //size of bytes symbols
 
 	for(j=0; j<fontPtr->pt; j+=fontPtr->heightPages)
@@ -215,14 +215,14 @@ int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, char ch)
  *****************************************************************************/
 void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
 {
-	tx_print_usart("\n\r Str  ");
+	//tx_print_usart("\n\r Str  ");
 	char b;
 	do{
 		b = *str - 0x90 + 10;
 		x0 += GL_DrawChar(font, x0, y0, b);
-		tx_hexprint_usart(&b, 1);
+		//tx_hexprint_usart(&b, 1);
 	}
-	while(*str++);
+	while(*(++str));
 }
 /****************************************************************************/
 /**
@@ -235,7 +235,21 @@ void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
  *****************************************************************************/
 void GLClock_Phrase1()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 0, 0, "¿¡¬√ƒﬂ");
+	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, "«¿√–”«");
+}
+void GLClock_Phrase2()
+{
+	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, "“≈’");
+	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, "œ≈–≈–€¬");
+}
+void GLClock_Phrase3()
+{
+	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, "—À»¬");
+	GL_DrawStr(GL_FONT_SEGOE14, 2, 16, "“ŒœÀ»¬¿");
+}
+void GLClock_Phrase4()
+{
+	GL_DrawStr(GL_FONT_SEGOE14, 2, 1, "—œ¿—»¡Œ");
 }
 /****************************************************************************/
 /**

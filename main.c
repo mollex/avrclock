@@ -125,7 +125,23 @@ void Task_Main()
 		{
 			state = 0xF0;
 
-		}else if(rc5cmd == IR_COM_ESC)
+		}else if(rc5cmd == IR_COM_RED)
+		{
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_Phrase2();
+			state = 0xF1;
+		}else if(rc5cmd == IR_COM_GREEN)
+		{
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_Phrase3();
+			state = 0xF1;
+		}else if(rc5cmd == IR_COM_BLUE)
+		{
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_Phrase4();
+			state = 0xF1;
+		}
+		else if(rc5cmd == IR_COM_ON)
 		{
 			state = 0;
 		}
@@ -147,11 +163,12 @@ void Task_Main()
 				memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 
 				if(GLClock_SetClockSetting(rc5cmd)==0){
-					state++;
+					state = 0xFF;
 					GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , 1);
 					_count = 0;
 				}
 			}
+		case 0xF1:
 
 			break;
 		default:
@@ -166,13 +183,14 @@ int main(void) {
 
 	uart_init();
 	dmdp10_Init();
+	GLClock_Phrase1();
 	ds1307_init();
 	ds18x20_ReadTemp();
 	ds18x20_ReadTemp();
 	rc5Init();
 
 	sei();
-	GLClock_Phrase1();
+	//GLClock_Phrase2();
 	while (1) {
 
 		_count++;
