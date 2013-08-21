@@ -61,4 +61,5 @@ void GLClock_Phrase1();
 void GLClock_Phrase2();
 void GLClock_Phrase3();
 void GLClock_Phrase4();
+void GLClock_Phrase5();
 #endif /* GL_H_ */

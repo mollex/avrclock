@@ -218,7 +218,13 @@ void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
 	//tx_print_usart("\n\r Str  ");
 	char b;
 	do{
+		if(*str >= 0xC0)
+		{
 		b = *str - 0x90 + 10;
+		}else
+		{
+			b = *str;
+		}
 		x0 += GL_DrawChar(font, x0, y0, b);
 		//tx_hexprint_usart(&b, 1);
 	}
@@ -236,8 +242,8 @@ void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
 void GL_DrawDots4(uint16_t x0, uint16_t y0, char val)
 {
 	gl_setpixel(x0, y0, val);
-	gl_setpixel(x0++, y0, val);
-	gl_setpixel(x0, y0++, val);
+	gl_setpixel(++x0, y0, val);
+	gl_setpixel(x0, ++y0, val);
 	gl_setpixel(--x0, y0, val);
 }
 /****************************************************************************/
@@ -257,19 +263,24 @@ void GLClock_Phrase1()
 void GLClock_Phrase2()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, "“≈’");
-	GL_DrawDots4(35, 8, 1);
+	GL_DrawDots4(47, 12, 1);
 	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, "œ≈–≈–€¬");
 }
 void GLClock_Phrase3()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, "—À»¬");
-	GL_DrawStr(GL_FONT_SEGOE14, 2, 16, "“ŒœÀ»¬");
-	GL_DrawDots4(60, 29, 1);
+	GL_DrawStr(GL_FONT_SEGOE14, 0, 16, "“0œÀ»¬¿");
+	//GL_DrawDots4(58, 27, 1);
 }
 void GLClock_Phrase4()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 2, 1, "—œ¿—»¡");
-	GL_DrawDots4(60, 10, 1);
+	GL_DrawStr(GL_FONT_SEGOE14, 0, 2, "—œ¿—»¡0");
+	//GL_DrawDots4(60, 11, 1);
+}
+void GLClock_Phrase5()
+{
+	GL_DrawStr(GL_FONT_SEGOE14, 3, 1, "«»ÃÕ»…");
+	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, "ƒ»«≈À‹");
 }
 /****************************************************************************/
 /**

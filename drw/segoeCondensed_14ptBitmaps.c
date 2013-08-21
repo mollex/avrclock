@@ -345,7 +345,7 @@ unsigned char segoeCondensed_14ptBitmaps[]  PROGMEM =
 			0x8F, 0x01, // ####   ##
 			0x8F, 0x01, // ####   ##
 			0x87, 0x01, // ###    ##
-			0x87, 0x01, // ###    ##
+			0x00, 0x00, // ###    ##
 
 			// @350 'Ê' (10 pixels wide)
 			0xC3, 0x01, // ##    ###

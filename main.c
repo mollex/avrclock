@@ -73,9 +73,9 @@ char Task_Clock(char count)
 		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , timedots);
 
-	}else if(_count < 50)
+	}else if(_count < 60)
 	{
-		if((_count % 10) == 0)
+		if((_count % 5) == 0)
 		{
 			GLClock_SetDots(++timedots & 0x01);
 		}
@@ -115,6 +115,11 @@ void Task_Main()
 		{
 			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 			GLClock_Phrase4();
+			state = 0xF1;
+		}else if(rc5cmd == IR_COM_YELLOW)
+		{
+			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+			GLClock_Phrase5();
 			state = 0xF1;
 		}
 		else if(rc5cmd == IR_COM_ON)
