@@ -233,23 +233,43 @@ void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
  * @return None.
  *
  *****************************************************************************/
+void GL_DrawDots4(uint16_t x0, uint16_t y0, char val)
+{
+	gl_setpixel(x0, y0, val);
+	gl_setpixel(x0++, y0, val);
+	gl_setpixel(x0, y0++, val);
+	gl_setpixel(--x0, y0, val);
+}
+/****************************************************************************/
+/**
+ * @brief	 	‘ÛÌÍˆËˇ
+ *
+ * @param None 	¿„ÛÏÂÌÚ
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 void GLClock_Phrase1()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, "«¿√–”«");
+	GL_DrawDots4(60, 17, 1);
 }
 void GLClock_Phrase2()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, "“≈’");
+	GL_DrawDots4(35, 8, 1);
 	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, "œ≈–≈–€¬");
 }
 void GLClock_Phrase3()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, "—À»¬");
-	GL_DrawStr(GL_FONT_SEGOE14, 2, 16, "“ŒœÀ»¬¿");
+	GL_DrawStr(GL_FONT_SEGOE14, 2, 16, "“ŒœÀ»¬");
+	GL_DrawDots4(60, 29, 1);
 }
 void GLClock_Phrase4()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 2, 1, "—œ¿—»¡Œ");
+	GL_DrawStr(GL_FONT_SEGOE14, 2, 1, "—œ¿—»¡");
+	GL_DrawDots4(60, 10, 1);
 }
 /****************************************************************************/
 /**
@@ -309,8 +329,9 @@ char GLClock_SetClockSetting(unsigned char cmd)
 	{
 		val[0] = val[1] = val[2] = val[3] = 0xFF;
 		indx = 0;
+		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 	}
-	else
+	else if(cmd < 10)
 	{
 		if(indx == 0)
 		{
@@ -346,10 +367,10 @@ char GLClock_SetClockSetting(unsigned char cmd)
 	}
 
 	GLClock_SetDots(1);
-	if(val[0] == 0xFF)GLClock_SetCursor(1,27); else GL_DrawChar(GL_FONT_SEGMENTAL28, 0, 2, val[0] + '0');
-	if(val[1] == 0xFF)GLClock_SetCursor(17,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 16, 2, val[1] + '0');
-	if(val[2] == 0xFF)GLClock_SetCursor(33,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 34, 2, val[2] + '0');
-	if(val[3] == 0xFF)GLClock_SetCursor(51,27);else GL_DrawChar(GL_FONT_SEGMENTAL28, 50, 2, val[3] + '0');
+	if(val[0] == 0xFF)GLClock_SetCursor(1,26); else GL_DrawChar(GL_FONT_SEGMENTAL28, 0, 2, val[0] + '0');
+	if(val[1] == 0xFF)GLClock_SetCursor(17,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 16, 2, val[1] + '0');
+	if(val[2] == 0xFF)GLClock_SetCursor(33,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 34, 2, val[2] + '0');
+	if(val[3] == 0xFF)GLClock_SetCursor(51,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 50, 2, val[3] + '0');
 
 	return ret;
 }

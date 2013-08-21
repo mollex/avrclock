@@ -57,4 +57,8 @@ void GLClock_ShowTemp(unsigned char val, unsigned char sign);
 void GLClock_SetDots(char val);
 char GLClock_SetClockSetting(unsigned char cmd);
 
+void GLClock_Phrase1();
+void GLClock_Phrase2();
+void GLClock_Phrase3();
+void GLClock_Phrase4();
 #endif /* GL_H_ */

@@ -30,6 +30,7 @@ extern unsigned char ds18x20_Sign();
 
 extern void ds1307_init();
 extern void ds1307_update();
+extern void ds1307_adjust();
 extern unsigned char ds1307_getsec();
 extern unsigned char ds1307_getmin();
 extern unsigned char ds1307_gethour();
@@ -38,77 +39,52 @@ extern void ds1307_setTime(unsigned char hour, unsigned char min);
 unsigned char _val = 0;
 unsigned char _count = 0;
 
-char Task_Temp()
+char Task_Temp(char count)
 {
-	static unsigned char state = 0;
+	char ret = 1;
 
-	tx_print_usart("state ");	tx_hexprint_usart(&state, 1);
-
-	switch(state)
+	//tx_print_usart("count ");	tx_hexprint_usart(&count, 1);
+	if(count == 0)
 	{
-		case 0:
-			state++;
-			break;
-		case 1:
-			state++;
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
-			_val = ds18x20_GetHight();
-			//tx_print_usart("T  ");	tx_hexprint_usart(&_val, 1);
-			break;
-		case 2:
-			if(_count > 20)
-			{
-				state++;
-			}
-			break;
-		case 3:
-			ds18x20_ReadTemp();
-			state++;
-			break;
-		default:
-			state = 0;
-			break;
+		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
+
+	}else
+	{
+		if(_count > 20)
+		{
+			ret = 0;
+		}
 	}
-	return state;
+
+	return ret;
 }
 
-char Task_Clock()
+char Task_Clock(char count)
 {
-	static unsigned char hour;
-	static unsigned char min;
-	static unsigned char state = 0;
-	static unsigned char timeshow= 0;
+	char ret = 1;
+	static unsigned char timedots= 1;
 
-	switch(state)
+	//tx_print_usart("count ");	tx_hexprint_usart(&count, 1);
+	if(count == 0)
 	{
-		case 0:
-			state++;
-			break;
-		case 1:
-			ds1307_update();
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , 1);
+		timedots= 1;
+		ds1307_update();
+		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , timedots);
 
-			_count = 0;
-			timeshow= 0;
-			state++;
-
-			break;
-		case 2:
-			if(_count > 5)
-			{
-				_count = 0;
-				GLClock_SetDots(timeshow & 0x01);
-				if(timeshow++ > 7)state = 0xFF;
-			}
-			break;
-
-		default:
-			state = 0;
-			break;
+	}else if(_count < 50)
+	{
+		if((_count % 10) == 0)
+		{
+			GLClock_SetDots(++timedots & 0x01);
+		}
+	}else
+	{
+		ret = 0;
 	}
-	return state;
+
+	return ret;
 }
 
 void Task_Main()
@@ -151,20 +127,25 @@ void Task_Main()
 	switch(state)
 	{
 		case 0:
-			if(Task_Clock() == 0) state++;
+			if(Task_Clock(_count++) == 0)
+			{
+				state++;
+				_count = 0;
+			}
 			break;
 		case 1:
-			if(Task_Temp() == 0) state++;
+			if(Task_Temp(_count++) == 0)
+			{
+				state++;
+				_count = 0;
+			}
 			break;
 
 		case 0xF0:
 			if(isrc5)
 			{
-				memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-
 				if(GLClock_SetClockSetting(rc5cmd)==0){
-					state = 0xFF;
-					GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , 1);
+					state = 0;
 					_count = 0;
 				}
 			}
@@ -190,16 +171,12 @@ int main(void) {
 	rc5Init();
 
 	sei();
-	//GLClock_Phrase2();
 	while (1) {
 
-		_count++;
-		//_count = 'Á';
 		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&_count, 1);
 
 		_delay_ms(100);
 
-		//ds1307_update();
 		Task_Main();
 	}
 }

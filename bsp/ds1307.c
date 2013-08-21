@@ -167,6 +167,34 @@ void ds1307_setTime(unsigned char hour, unsigned char min)
  * @param 	b.
  * @return  none
  ***************************************************************************/
+void ds1307_adjust()
+{
+	unsigned char sec;
+	static unsigned char flag = 0;
+
+	if(_DS1307.hour == 3 && _DS1307.min == 0)
+	{
+		sec =  ds1307_read(DS1307_REG_SEC);
+		if(sec > 15 && sec < 50)
+		{
+			if(flag == 0)
+			{
+				flag = 1;
+
+			}
+		}
+	}else
+	{
+		flag = 0;
+	}
+}
+/**<
+ * **************************************************************************
+ * @brief	Function
+ *
+ * @param 	b.
+ * @return  none
+ ***************************************************************************/
 void ds1307_update()
 {
   _DS1307.sec =  bcd2dec(ds1307_read(DS1307_REG_SEC));
