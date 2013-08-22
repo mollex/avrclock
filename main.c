@@ -48,7 +48,7 @@ char Task_Temp(char count)
 	{
 		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
-
+		ds18x20_ReadTemp();
 	}else
 	{
 		if(_count > 20)
@@ -125,6 +125,7 @@ void Task_Main()
 		else if(rc5cmd == IR_COM_ON)
 		{
 			state = 0;
+			_count = 0;
 		}
 	}
 
