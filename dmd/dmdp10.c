@@ -56,6 +56,7 @@ LED Panel Layout in RAM
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/delay.h>
+#include <avr/wdt.h>
 
 #include "gl.h"
 /************************** Constant Definitions ****************************/
@@ -120,7 +121,15 @@ void dmdp10_Scan();
  ***************************************************************************/
 ISR (TIMER2_OVF_vect)
 {
+	static char wdtcount = 0;
 	 dmdp10_Scan();
+
+	 //reset every 4ms*27 = 100 ms;
+	 if(wdtcount++ > 25)
+	 {
+		 wdt_reset();
+		 wdtcount = 0;
+	 }
 }
 /**<
  * **************************************************************************

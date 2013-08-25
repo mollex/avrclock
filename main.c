@@ -12,6 +12,7 @@
 #include <avr/io.h>
 #include <avr/delay.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 #include "gl.h"
 #include "font.h"
@@ -49,6 +50,7 @@ char Task_Temp(char count)
 		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
 		ds18x20_ReadTemp();
+
 	}else
 	{
 		if(_count > 20)
@@ -65,7 +67,7 @@ char Task_Clock(char count)
 	char ret = 1;
 	static unsigned char timedots= 1;
 
-	//tx_print_usart("count ");	tx_hexprint_usart(&count, 1);
+
 	if(count == 0)
 	{
 		timedots= 1;
@@ -164,9 +166,19 @@ void Task_Main()
 	}
 }
 
+
 int main(void) {
 
-	_delay_ms(300);
+	wdt_reset();
+	/* Clear WDRF in MCUSR */
+	MCUSR &= ~(1<<WDRF);
+	/* Write logical one to WDCE and WDE */
+	/* Keep old prescaler setting to prevent unintentional time-out */
+	WDTCSR |= (1<<WDCE) | (1<<WDE);
+	/* Turn off WDT */
+	WDTCSR = 0x00;
+
+	_delay_ms(500);
 
 	uart_init();
 	dmdp10_Init();
@@ -176,7 +188,11 @@ int main(void) {
 	ds18x20_ReadTemp();
 	rc5Init();
 
+	wdt_reset();
+	wdt_enable(WDTO_120MS);
+
 	sei();
+
 	while (1) {
 
 		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
