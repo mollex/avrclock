@@ -28,9 +28,9 @@
 /************************** Constant Definitions ****************************/
 
 // Port configuration registers for 1-Wire buses.
-#define     OWI_PORT        PORTD   //!< 1-Wire PORT Data register.
-#define     OWI_PIN         PIND    //!< 1-Wire Input pin register.
-#define     OWI_DDR         DDRD    //!< 1-Wire Data direction register.
+#define     OWI_PORT        PORTB   //!< 1-Wire PORT Data register.
+#define     OWI_PIN         PINB    //!< 1-Wire Input pin register.
+#define     OWI_DDR         DDRB    //!< 1-Wire Data direction register.
 // Pin bitmasks.
 #define     OWI_PIN_0       0x01
 #define     OWI_PIN_1       0x02
@@ -40,7 +40,7 @@
 #define     OWI_PIN_5       0x20
 #define     OWI_PIN_6       0x40
 #define     OWI_PIN_7       0x80
-#define 	DS18B20_PIN   	OWI_PIN_2
+#define 	DS18B20_PIN   	OWI_PIN_0
 // Timing parameters
 #define     CPU_FREQUENCY    CPU_CLOCK
 #define     OWI_DELAY_OFFSET_CYCLES    13   //!< Timing delay when pulling bus low and releasing bus.
