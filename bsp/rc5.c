@@ -35,9 +35,10 @@
 #include <avr/delay.h>
 
 /************************** Constant Definitions ****************************/
+#define	RC5_PORT_OUT	PORTD
 #define	RC5_PORT_SET	DDRD
 #define	RC5_PORT_IN		PIND
-#define	RC5_PIN			PD3			// IR input low active
+#define	RC5_PIN			PD7			// IR input low active
 
 #define	XTAL		16000000
 
@@ -99,9 +100,6 @@ ISR (TIMER0_OVF_vect)
   }
 
   rc5_tmp = tmp;
-
- // dmdp10_Scan();
-  //if(rccount++ == 0x2){rccount = 0; dmdp10_Scan();}
 }
 /**<
  * **************************************************************************
@@ -114,7 +112,7 @@ void rc5Init()
 {
 
 	RC5_PORT_SET &=  ~(1<<RC5_PIN);
-	PORTD |= (1<<RC5_PIN);
+	RC5_PORT_OUT |= (1<<RC5_PIN);
 
 
 #if defined (__AVR_ATmega8__)
@@ -124,7 +122,7 @@ void rc5Init()
 
 #else
 		TCCR0B = 1<<CS02;			//divide by 256
-		TIMSK0 = 1<<TOIE0;			//enable timer interrupt
+		TIMSK0 |= 1<<TOIE0;			//enable timer interrupt
 #endif
 }
 

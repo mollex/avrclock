@@ -82,6 +82,7 @@ char TWIM_Init(uint32_t TWI_Bitrate)
 char TWIM_Start(uint8_t address, uint8_t TWIM_Type)
 {
 	uint8_t twst;
+	int count = 1000;
 /*
 ** Send START condition
 */
@@ -89,7 +90,13 @@ char TWIM_Start(uint8_t address, uint8_t TWIM_Type)
 /*
 ** Wait until transmission completed
 */
-	while (!(TWCR & _BV(TWINT)));
+	while (!(TWCR & _BV(TWINT)))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 /*
 ** Check value of TWI Status Register. Mask prescaler bits.
 */
@@ -104,7 +111,14 @@ char TWIM_Start(uint8_t address, uint8_t TWIM_Type)
 /*
 ** Wait until transmission completed and ACK/NACK has been received
 */
-	while (!(TWCR & _BV(TWINT)));
+	count = 1000;
+	while (!(TWCR & _BV(TWINT)))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 /*
 ** Check value of TWI Status Register. Mask prescaler bits.
 */
@@ -126,6 +140,7 @@ char TWIM_Start(uint8_t address, uint8_t TWIM_Type)
 *******************************************************/
 void TWIM_Stop (void)
 {
+	int count = 1000;
 /*
 ** Send stop condition
 */
@@ -133,7 +148,13 @@ void TWIM_Stop (void)
 /*
 ** Wait until stop condition is executed and bus released
 */
-	while (TWCR & _BV(TWSTO));
+	while (TWCR & _BV(TWSTO))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 }
 /*******************************************************
  Public Function: TWIM_Write
@@ -151,12 +172,19 @@ void TWIM_Stop (void)
 char TWIM_Write(uint8_t byte)
 {
 	uint8_t   twst;
+	int count = 1000;
 	//Send data to the previously addressed device
 	TWDR = byte;
 	TWCR = _BV(TWINT)|_BV(TWEN);
 
 	//Wait until transmission completed
-	while (!(TWCR & _BV(TWINT)));
+	while (!(TWCR & _BV(TWINT)))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 
 	//Check value of TWI Status Register. Mask prescaler bits
 	twst = TW_STATUS;
@@ -178,8 +206,15 @@ char TWIM_Write(uint8_t byte)
 *******************************************************/
 char TWIM_ReadAck(void)
 {
+	int count = 1000;
 	TWCR = _BV(TWINT)|_BV(TWEN)|_BV(TWEA);
-	while (!(TWCR & _BV(TWINT)));
+	while (!(TWCR & _BV(TWINT)))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 
 	return TWDR;
 }
@@ -196,9 +231,15 @@ char TWIM_ReadAck(void)
 *******************************************************/
 char TWIM_ReadNack(void)
 {
+	int count = 1000;
 	TWCR = _BV(TWINT)|_BV(TWEN);
-	while (!(TWCR & _BV(TWINT)));
-
+	while (!(TWCR & _BV(TWINT)))
+	{
+		if(count-- == 0)
+		{
+			break;
+		}
+	}
 	return TWDR;
 }
 

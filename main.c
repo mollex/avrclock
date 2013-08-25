@@ -172,14 +172,14 @@ int main(void) {
 	dmdp10_Init();
 	GLClock_Phrase1();
 	ds1307_init();
-	ds18x20_ReadTemp();
-	ds18x20_ReadTemp();
+	//ds18x20_ReadTemp();
+	//ds18x20_ReadTemp();
 	rc5Init();
 
 	sei();
 	while (1) {
 
-		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&_count, 1);
+		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
 		_delay_ms(100);
 

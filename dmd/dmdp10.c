@@ -60,19 +60,27 @@ LED Panel Layout in RAM
 #include "gl.h"
 /************************** Constant Definitions ****************************/
 
-// ######################################################################################################################
-// ######################################################################################################################
 //#warning CHANGE THESE TO SEMI-ADJUSTABLE PIN DEFS!
-//Arduino pins used for the display connection
-#define PIN_DMD_nOE       6    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
-#define PIN_DMD_A         0    // D0
-#define PIN_DMD_B         7    // D7
-#define PIN_DMD_CLK       5   // D13_SCK  is SPI Clock if SPI is used
-#define PIN_DMD_SCLK      1    // D8
-#define PIN_DMD_R_DATA    3   // D11_MOSI is SPI Master Out if SPI is used
-//Define this chip select pin that the Ethernet W5100 IC or other SPI device uses
-//if it is in use during a DMD scan request then scanDisplayBySPI() will exit without conflict! (and skip that scan)
 
+#define PIN_DMD_nOE       2    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
+#define PORT_DMD_nOE      PORTC
+#define DDR_DMD_nOE       DDRC
+
+#define PIN_DMD_A         1      // A select stroke
+#define PORT_DMD_A        PORTC  //
+#define DDR_DMD_A         DDRC   //
+
+#define PIN_DMD_B         0    	// B select stroke
+#define PORT_DMD_B        PORTC //
+#define DDR_DMD_B         DDRC  //
+
+#define PIN_DMD_CLK       5   // SCK  is SPI Clock if SPI is used
+
+#define PIN_DMD_SCLK      1   	// SCLK for registers
+#define PORT_DMD_SCLK     PORTB //
+#define DDR_DMD_SCLK      DDRB  //
+
+#define PIN_DMD_R_DATA    3   // MOSI is SPI Master Out if SPI is used
 /**************************** Type Definitions ******************************/
 
 /***************** Macros (Inline Functions) Definitions ********************/
@@ -85,14 +93,14 @@ LED Panel Layout in RAM
 #endif
 
 //DMD I/O pin macros
-#define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORTD, PIN_DMD_B ); cbi( PORTB, PIN_DMD_A ); }
-#define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORTD, PIN_DMD_B ); sbi( PORTB, PIN_DMD_A ); }
-#define LIGHT_DMD_ROW_03_07_11_15()       { sbi( PORTD, PIN_DMD_B ); cbi( PORTB, PIN_DMD_A ); }
-#define LIGHT_DMD_ROW_04_08_12_16()       { sbi( PORTD, PIN_DMD_B ); sbi( PORTB, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_01_05_09_13()       { cbi( PORT_DMD_B, PIN_DMD_B ); cbi( PORT_DMD_A, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_02_06_10_14()       { cbi( PORT_DMD_B, PIN_DMD_B ); sbi( PORT_DMD_A, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_03_07_11_15()       { sbi( PORT_DMD_B, PIN_DMD_B ); cbi( PORT_DMD_A, PIN_DMD_A ); }
+#define LIGHT_DMD_ROW_04_08_12_16()       { sbi( PORT_DMD_B, PIN_DMD_B ); sbi( PORT_DMD_A, PIN_DMD_A ); }
 
-#define LATCH_DMD_SHIFT_REG_TO_OUTPUT()   { sbi( PORTB, PIN_DMD_SCLK ); cbi( PORTB,  PIN_DMD_SCLK ); }
-#define OE_DMD_ROWS_OFF()                 { cbi( PORTD, PIN_DMD_nOE ); }
-#define OE_DMD_ROWS_ON()                  { sbi( PORTD, PIN_DMD_nOE ); }
+#define LATCH_DMD_SHIFT_REG_TO_OUTPUT()   { sbi( PORT_DMD_SCLK, PIN_DMD_SCLK ); cbi( PORT_DMD_SCLK,  PIN_DMD_SCLK ); }
+#define OE_DMD_ROWS_OFF()                 { cbi( PORT_DMD_nOE, PIN_DMD_nOE ); }
+#define OE_DMD_ROWS_ON()                  { sbi( PORT_DMD_nOE, PIN_DMD_nOE ); }
 
 /************************** Variable Definitions ****************************/
 
@@ -113,7 +121,6 @@ void dmdp10_Scan();
 ISR (TIMER2_OVF_vect)
 {
 	 dmdp10_Scan();
-	 //TCNT2 = -128;
 }
 /**<
  * **************************************************************************
@@ -177,34 +184,26 @@ ISR (TIMER2_OVF_vect)
  * @param 	None.
  * @return  None.
  ***************************************************************************/
-char dmdp10_scanQadroModule(char chnl)
+/*char dmdp10_scanQadroModule(char chnl)
 {
 	static int j = 1;
 	static int i = 0;
 	char ret = 1;
 
-	//spi_count = 1;
-	/*spi_buff[1] = (~_VideoBuf.vbuff[j][i][8 + chnl]);
-	spi_buff[2] = (~_VideoBuf.vbuff[j][i][4 + chnl]);
-	spi_buff[3] = (~_VideoBuf.vbuff[j][i][0 + chnl]);*/
-	//spi_send(~_VideoBuf.vbuff[j][i][12 + chnl]);
+	//spi_transfer(~_VideoBuf.vbuff[j][i][12 + chnl]);
+	//spi_transfer(~_VideoBuf.vbuff[j][i][8 + chnl]);
+	//spi_transfer(~_VideoBuf.vbuff[j][i][4 + chnl]);
+	//spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);
 
-			/*spi_transfer(~_VideoBuf.vbuff[j][i][12 + chnl]);
-			spi_transfer(~_VideoBuf.vbuff[j][i][8 + chnl]);
-			spi_transfer(~_VideoBuf.vbuff[j][i][4 + chnl]);
-			spi_transfer(~_VideoBuf.vbuff[j][i][0 + chnl]);*/
-
-			if(++i > 16)
-			{
-				i = 0;
-				spi_send(1);
-				ret = 0;
-				//if(j-- <= 0){ j = 1; ret = 0;}
-			}
-
+	if(++i > 16)
+	{
+		i = 0;
+		spi_send(1);
+		ret = 0;
+	}
 
 	return ret;
-}
+}*/
 /**<
  * **************************************************************************
  * @brief	Function scan led module
@@ -215,7 +214,6 @@ char dmdp10_scanQadroModule(char chnl)
 void dmdp10_Scan()
 {
 	static uint8_t chnl = 0;
-
 
 		OE_DMD_ROWS_OFF();
 		LATCH_DMD_SHIFT_REG_TO_OUTPUT();
@@ -237,12 +235,9 @@ void dmdp10_Scan()
 
 		OE_DMD_ROWS_ON();
 
-
-
 		chnl++;
 		if(chnl>3) chnl = 0;
 		spi_send(chnl);
-
 }
 /**<
  * **************************************************************************
@@ -253,23 +248,22 @@ void dmdp10_Scan()
  ***************************************************************************/
 void dmdp10_Init()
 {
-	DDRB  |= (1<<PIN_DMD_A) | (1<<PIN_DMD_SCLK);
-	PORTB = 0x00;
-
-	DDRD  |= (1<<PIN_DMD_B) | (1<<PIN_DMD_nOE);
-	PORTD= 0x00;
+	DDR_DMD_A |= (1<<PIN_DMD_A);
+	DDR_DMD_B |= (1<<PIN_DMD_B);
+	DDR_DMD_SCLK |= (1<<PIN_DMD_SCLK);
+	DDR_DMD_nOE  |= (1<<PIN_DMD_nOE);
 
 	spi_init();
 
 #if defined (__AVR_ATmega8__)
 
 		TCCR2 = 1<<CS21 | 1<<CS22;			//divide by 256
-		TIMSK = 1<<TOIE2;			//enable timer interrupt
+		TIMSK |= 1<<TOIE2;			//enable timer interrupt
 
 #else
-		TCCR2B = 1<<CS02;			//divide by 256
-		TIMSK2 = 1<<TOIE0;			//enable timer interrupt
+		TCCR2B = 1<<CS21 | 1<<CS22;			//divide by 256
+		TIMSK2 |= 1<<TOIE2;			//enable timer interrupt
 #endif
 
-		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
 }
