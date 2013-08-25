@@ -42,7 +42,8 @@
 /**************************** Type Definitions ******************************/
 
 /***************** Macros (Inline Functions) Definitions ********************/
-
+extern void Eprom_MjrSave(unsigned char addr, char val);
+extern char Eprom_MjrLoad(unsigned char addr);
 /************************** Variable Definitions ****************************/
 extern  FontChar_t segmental_28ptDescriptors[];
 extern  unsigned char segmental_28ptBitmaps[];
@@ -291,6 +292,44 @@ void GLClock_Phrase5()
  * @return None.
  *
  *****************************************************************************/
+void GLClock_SetSign(unsigned char sign)
+{
+			GL_DrawLine(4, 11, 4, 20, sign ? 0 : 1);
+			GL_DrawLine(5, 11, 5, 20, sign ? 0 : 1);
+	GL_DrawLine(0, 15, 9, 15, 1);
+	GL_DrawLine(0, 16, 9, 16, 1);
+
+}
+void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
+{
+	char hight = val/10 + '0';
+	char low = val%10 + '0';
+
+	GL_DrawChar(font, 11, 2, hight);
+	GL_DrawChar(font, 28, 2, low);
+	GL_DrawChar(font, 50, 2, 'C');
+
+	GL_DrawLine(45, 3, 47, 3, 1);
+	GL_DrawLine(45, 8, 47, 8, 1);
+	GL_DrawLine(44, 4, 44, 7, 1);
+	GL_DrawLine(48, 4, 48, 7, 1);
+
+	GLClock_SetSign(sign);
+}
+
+void GLClock_ShowTemp(unsigned char val, unsigned char sign)
+{
+	 GLClock_SetTemp(GL_FONT_SEGMENTAL28, val, sign);
+}
+/****************************************************************************/
+/**
+ * @brief	 	Функция
+ *
+ * @param None 	Аргумент
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 void GLClock_SetHour(unsigned char font, char val)
 {
 	char hight = val/10 + '0';
@@ -385,39 +424,40 @@ char GLClock_SetClockSetting(unsigned char cmd)
 
 	return ret;
 }
-/****************************************************************************/
-/**
- * @brief	 	Функция
- *
- * @param None 	Аргумент
- *
- * @return None.
- *
- *****************************************************************************/
-void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
+
+char GLClock_SetClockCorrect(unsigned char cmd)
 {
-	char hight = val/10 + '0';
-	char low = val%10 + '0';
-
-	GL_DrawChar(font, 11, 2, hight);
-	GL_DrawChar(font, 28, 2, low);
-	GL_DrawChar(font, 50, 2, 'C');
-
-	GL_DrawLine(45, 3, 47, 3, 1);
-	GL_DrawLine(45, 8, 47, 8, 1);
-	GL_DrawLine(44, 4, 44, 7, 1);
-	GL_DrawLine(48, 4, 48, 7, 1);
-
-	GL_DrawLine(0, 15, 9, 15, 1);
-	GL_DrawLine(0, 16, 9, 16, 1);
-	if(sign == 0)
+	char ret = 1;
+	static unsigned char val = 10;
+	if(cmd == IR_COM_VSD_PtoP)
 	{
-		GL_DrawLine(4, 11, 4, 20, 1);
-		GL_DrawLine(5, 11, 5, 20, 1);
-	}
-}
+		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		val = Eprom_MjrLoad(0x10);
+		if(val > 20)val = 10;
 
-void GLClock_ShowTemp(unsigned char val, unsigned char sign)
-{
-	 GLClock_SetTemp(GL_FONT_SEGMENTAL28, val, sign);
+	}else if(cmd == IR_COM_OK)
+	{
+		Eprom_MjrSave(0x10,  val);
+		ret = 0;
+	}
+	else
+	{
+		if(cmd == IR_COM_UP)
+			{
+				if(val<19)val++;
+			}
+		if(cmd == IR_COM_DOWN)
+			{
+				if(val > 1)val--;
+			}
+	}
+
+	GLClock_SetSign((val/10)? 0 : 1);
+
+	GL_DrawChar(GL_FONT_SEGMENTAL28, 11, 2, '0');
+	GL_DrawChar(GL_FONT_SEGMENTAL28, 28, 2, '0' + ((val/10)? val % 10 : 10 - val));
+	GL_DrawStr(GL_FONT_SEGOE14, 45, 17, "С");
+	GL_DrawDots4(54, 28, 1);
+
+	return ret;
 }

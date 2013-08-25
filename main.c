@@ -47,6 +47,7 @@ char Task_Temp(char count)
 	//tx_print_usart("count ");	tx_hexprint_usart(&count, 1);
 	if(count == 0)
 	{
+		tx_print_usart("\n\r Read Temp ");
 		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
 		ds18x20_ReadTemp();
@@ -70,10 +71,14 @@ char Task_Clock(char count)
 
 	if(count == 0)
 	{
+		tx_print_usart("\n\r Clock Update ");
 		timedots= 1;
 		ds1307_update();
 		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , timedots);
+
+
+		ds1307_adjust();
 
 	}else if(_count < 60)
 	{
@@ -98,12 +103,17 @@ void Task_Main()
 
 	if(rc5GetCmd(&rc5cmd))
 	{
+		_delay_ms(200);
 		isrc5 = 1;
 		if(rc5cmd == IR_COM_VSD_MENU)
 		{
 			state = 0xF0;
 
-		}else if(rc5cmd == IR_COM_RED)
+		}else if(rc5cmd == IR_COM_VSD_PtoP)
+		{
+			state = 0xE0;
+		}
+		else if(rc5cmd == IR_COM_RED)
 		{
 			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 			GLClock_Phrase2();
@@ -148,7 +158,15 @@ void Task_Main()
 				_count = 0;
 			}
 			break;
-
+		case 0xE0:
+			if(isrc5)
+			{
+				if(GLClock_SetClockCorrect(rc5cmd)==0){
+					state = 0;
+					_count = 0;
+				}
+			}
+			break;
 		case 0xF0:
 			if(isrc5)
 			{
@@ -157,6 +175,7 @@ void Task_Main()
 					_count = 0;
 				}
 			}
+			break;
 		case 0xF1:
 
 			break;
@@ -193,9 +212,11 @@ int main(void) {
 
 	sei();
 
+	tx_print_usart("\n\r GS Clock v2.02 ");
+
 	while (1) {
 
-		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
+		//tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
 		_delay_ms(100);
 

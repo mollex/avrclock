@@ -46,7 +46,8 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-
+extern void Eprom_MjrSave(unsigned char addr, char val);
+extern char Eprom_MjrLoad(unsigned char addr);
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************
@@ -169,18 +170,36 @@ void ds1307_setTime(unsigned char hour, unsigned char min)
  ***************************************************************************/
 void ds1307_adjust()
 {
+	unsigned char val;
 	unsigned char sec;
 	static unsigned char flag = 0;
 
-	if(_DS1307.hour == 3 && _DS1307.min == 0)
+	if(_DS1307.hour == 3 && _DS1307.min == 1)
 	{
-		sec =  ds1307_read(DS1307_REG_SEC);
-		if(sec > 15 && sec < 50)
+
+		sec =  bcd2dec(ds1307_read(DS1307_REG_SEC));
+		tx_print_usart("\n\r Time adjust ");	tx_hexprint_usart(&sec, 1);
+		if(sec > 15 && sec < 45)
 		{
+			tx_print_usart("\n\r Flag ");	tx_hexprint_usart(&flag, 1);
 			if(flag == 0)
 			{
-				flag = 1;
+				val = Eprom_MjrLoad(0x10);
+				tx_print_usart("\n\r Read  ");	tx_hexprint_usart(&val, 1);
+				if(val > 1 && val < 20)
+				{
+					if(val>=10)
+					{
+						sec = sec + val - 10;
+					}else
+					{
+						sec = sec - (10-val);
+					}
+					ds1307_write(DS1307_REG_SEC, dec2bcd(sec));
+					tx_print_usart("\n\r Time adjust new");	tx_hexprint_usart(&sec, 1);
+				}
 
+				flag = 1;
 			}
 		}
 	}else
