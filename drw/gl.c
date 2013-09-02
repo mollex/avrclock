@@ -121,7 +121,7 @@ extern void ds1307_setTime(unsigned char hour, unsigned char min);
  * @return None.
  *
  *****************************************************************************/
-void gl_setpixel(uint16_t x, uint16_t y, int val)
+void gl_setpixel(unsigned char x, unsigned char y, unsigned int val)
 {
 	if(x > _VideoBuf.xmax || y > _VideoBuf.ymax)	return;
 
@@ -136,11 +136,11 @@ void gl_setpixel(uint16_t x, uint16_t y, int val)
 		_VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
 	}
 }
-void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color) {
+void GL_DrawLine(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, char color) {
 
-	uint16_t dy = y1 - y0;
-	uint16_t dx = x1 - x0;
-	uint16_t stepx, stepy;
+	unsigned char dy = y1 - y0;
+	unsigned char dx = x1 - x0;
+	unsigned char stepx, stepy;
 
 	if (dy < 0) { dy = -dy;  stepy = -1; } else { stepy = 1; }
 	if (dx < 0) { dx = -dx;  stepx = -1; } else { stepx = 1; }
@@ -181,7 +181,7 @@ void GL_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
  * @return None.
  *
  *****************************************************************************/
-int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, char ch)
+int GL_DrawChar(unsigned char font, unsigned char x0, unsigned char y0, char ch)
 {
 	int j, i=0;
 	uint16_t val;
@@ -214,7 +214,7 @@ int GL_DrawChar(unsigned char font, uint16_t x0, uint16_t y0, char ch)
  * @return None.
  *
  *****************************************************************************/
-void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
+void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str)
 {
 	//tx_print_usart("\n\r Str  ");
 	char b;
@@ -227,7 +227,7 @@ void GL_DrawStr(unsigned char font, uint16_t x0, uint16_t y0, char *str)
 			b = *str;
 		}
 		x0 += GL_DrawChar(font, x0, y0, b);
-		//tx_hexprint_usart(&b, 1);
+		tx_hexprint_usart(&b, 1);
 	}
 	while(*(++str));
 }
@@ -282,6 +282,15 @@ void GLClock_Phrase5()
 {
 	GL_DrawStr(GL_FONT_SEGOE14, 3, 1, "ÇÈÌÍÈÉ");
 	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, "ÄÈÇÅËÜ");
+}
+void GLClock_Phrase6()
+{
+	int i, x = 64;
+	for(i=0; i<128; i++)
+	{
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 0, "ÁÅÃÓÙÀß  ");
+		_delay_ms(1000);
+	}
 }
 /****************************************************************************/
 /**

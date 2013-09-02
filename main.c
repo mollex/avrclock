@@ -201,25 +201,29 @@ int main(void) {
 
 	uart_init();
 	dmdp10_Init();
-	GLClock_Phrase1();
-	ds1307_init();
-	ds18x20_ReadTemp();
-	ds18x20_ReadTemp();
-	rc5Init();
+	//GLClock_Phrase1();
+	//ds1307_init();
+	//ds18x20_ReadTemp();
+	//ds18x20_ReadTemp();
+	//rc5Init();
 
-	wdt_reset();
-	wdt_enable(WDTO_120MS);
+	//wdt_reset();
+	//wdt_enable(WDTO_120MS);
+
+
 
 	sei();
 
 	tx_print_usart("\n\r GS Clock v2.02 ");
 
 	while (1) {
+		_count++;
+		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
-		//tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
+		GLClock_Phrase6();
+		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
+		_delay_ms(1000);
 
-		_delay_ms(100);
-
-		Task_Main();
+		//Task_Main();
 	}
 }
