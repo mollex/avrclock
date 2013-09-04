@@ -197,7 +197,7 @@ int main(void) {
 	/* Turn off WDT */
 	WDTCSR = 0x00;
 
-	_delay_ms(500);
+	//_delay_ms(500);
 
 	uart_init();
 	dmdp10_Init();

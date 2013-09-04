@@ -33,6 +33,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/delay.h>
+#include <math.h>
 
 #include "font.h"
 #include "gl.h"
@@ -215,7 +216,37 @@ int GL_DrawChar(unsigned char font, unsigned char x0, unsigned char y0, char ch)
 		}
 		y0++;
 	}
+	for(j=0; j<14; j++)
+	{
+		gl_setpixel(x0+i, y0--, 0);
+	}
 	return (i + fontPtr->spacePixels);
+}
+/****************************************************************************/
+/**
+ * @brief	 	‘ункци€
+ *
+ * @param None 	јргумент
+ *				русские верхний регистр от 0xC0 ... 0xDF
+ *				русские нижний регистр от 0xe0...0xFF
+ * @return None.
+ *
+ *****************************************************************************/
+char GL_GetCharSize(unsigned char font, char ch)
+{
+	//tx_print_usart("\n\r Str  ");
+	char b;
+	if(ch >= 0xC0)
+	{
+		b = ch - 0x90 + 10;
+	}else
+	{
+		b = ch;
+	}
+
+	int index = ch - '0';
+
+	return _Font[font].charInfo[index].widthBits;
 }
 /****************************************************************************/
 /**
@@ -240,7 +271,7 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 			b = *str;
 		}
 		x0 += GL_DrawChar(font, x0, y0, b);
-		tx_hexprint_usart(&b, 1);
+		//tx_hexprint_usart(&b, 1);
 		++str;
 	}
 	while(--size);
@@ -307,20 +338,49 @@ void GLClock_Phrase5()
 }
 void GLClock_Phrase6()
 {
-	char s[] = "Ѕ≈√”ўјя";
+	char s[] = "12345678112233112233";
 	unsigned char size  = sizeof(s);
-	int i, x = 64;
-	for(i=0; i<128; i++)
+	int i, strsize, index, x = 64;
+	char charsize, strlen;
+	//GL_DrawStr(GL_FONT_CONSOLAS, 0, 0, s, 5);
+	//_delay_ms(1000);
+
+	tx_print_usart("\n\r size  ");	tx_hexprint_usart(&(size), 1);
+	strlen = strsize = 0;
+	for(i=0; i<sizeof(s); i++)
+	{
+		strsize += GL_GetCharSize(GL_FONT_SEGOE14, s[i])+1;
+		tx_print_usart("\n\r strsize  ");	tx_hexprint_usart(&(strsize), 2);
+		if((strsize > 78) && (strlen == 0))
+		{
+			strlen = i;
+		}
+	}
+	strsize += 64;
+
+	tx_print_usart("\n\r strsize  ");	tx_hexprint_usart(&(strsize), 2);
+	tx_print_usart("\n\r strlen  ");	tx_hexprint_usart(&(strlen), 1);
+
+	index = 0;
+	charsize = GL_GetCharSize(GL_FONT_SEGOE14, s[index]);
+
+	for(i=0; i<strsize; i++)
 	{
 		if(x>0)
 		{
-			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, 5);
+			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, strlen);
 
 		}else
 		{
-			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, 5);
+			if(fabs(x) > charsize)
+			{
+				x = 0;
+				index++;
+				charsize = GL_GetCharSize(GL_FONT_SEGOE14, s[index]);
+			}
+			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, &s[index], strlen);
 		}
-		_delay_ms(1000);
+		_delay_ms(40);
 	}
 }
 /****************************************************************************/

@@ -35,7 +35,7 @@
 // This structure describes a single character's display information
 typedef struct
 {
-	const char widthBits;					// width, in bits (or pixels), of the character
+	const char widthBits;				// width, in bits (or pixels), of the character
 	const short offset;					// offset of the character's bitmap, in bytes, into the the FONT_INFO's data array
 
 } FontChar_t;
