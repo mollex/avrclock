@@ -51,6 +51,9 @@ extern  unsigned char segmental_28ptBitmaps[];
 extern  FontChar_t segoeCondensed_14ptDescriptors[];
 extern  unsigned char segoeCondensed_14ptBitmaps[];
 
+extern  FontChar_t consolas_20ptDescriptors[];
+extern  unsigned char consolas_20ptBitmaps[];
+
 // Font information for Courier New 8pt
 Font_t _Font[] =
 {
@@ -65,12 +68,22 @@ Font_t _Font[] =
 	},
 	{
 		.heightPages = 2, //  Character height
-		.pt = 54,
+		.pt = 28,
 		.startChar = '0', //  Start character
 		.endChar = '9', //  End character
 		.spacePixels = 1, //  Width, in pixels, of space character
 		.charInfo = segoeCondensed_14ptDescriptors, //  Character descriptor array
 		.dataPtr = segoeCondensed_14ptBitmaps, //  Character bitmap array
+	},
+
+	{
+		.heightPages = 2, //  Character height
+		.pt = 40,
+		.startChar = '0', //  Start character
+		.endChar = '9', //  End character
+		.spacePixels = 1, //  Width, in pixels, of space character
+		.charInfo = consolas_20ptDescriptors, //  Character descriptor array
+		.dataPtr = consolas_20ptBitmaps, //  Character bitmap array
 	},
 };
 
@@ -214,7 +227,7 @@ int GL_DrawChar(unsigned char font, unsigned char x0, unsigned char y0, char ch)
  * @return None.
  *
  *****************************************************************************/
-void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str)
+void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str, unsigned char size)
 {
 	//tx_print_usart("\n\r Str  ");
 	char b;
@@ -228,8 +241,9 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 		}
 		x0 += GL_DrawChar(font, x0, y0, b);
 		tx_hexprint_usart(&b, 1);
+		++str;
 	}
-	while(*(++str));
+	while(--size);
 }
 /****************************************************************************/
 /**
@@ -258,37 +272,54 @@ void GL_DrawDots4(uint16_t x0, uint16_t y0, char val)
  *****************************************************************************/
 void GLClock_Phrase1()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, "«¿√–”«");
+	char s[] = "«¿√–”«";
+	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, s, sizeof(s));
 	GL_DrawDots4(60, 17, 1);
 }
 void GLClock_Phrase2()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, "“≈’");
+	char s[] = "“≈’";
+	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, s, sizeof(s));
 	GL_DrawDots4(47, 12, 1);
-	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, "œ≈–≈–€¬");
+	char s2[] = "œ≈–≈–€¬";
+	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, s2, sizeof(s2));
 }
 void GLClock_Phrase3()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, "—À»¬");
-	GL_DrawStr(GL_FONT_SEGOE14, 0, 16, "“0œÀ»¬¿");
+	char s[] = "—À»¬";
+	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, s, sizeof(s));
+	char s2[] = "“0œÀ»¬¿";
+	GL_DrawStr(GL_FONT_SEGOE14, 0, 16, s2, sizeof(s2));
 	//GL_DrawDots4(58, 27, 1);
 }
 void GLClock_Phrase4()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 0, 2, "—œ¿—»¡0");
+	char s[] = "—œ¿—»¡0";
+	GL_DrawStr(GL_FONT_SEGOE14, 0, 2, s, sizeof(s));
 	//GL_DrawDots4(60, 11, 1);
 }
 void GLClock_Phrase5()
 {
-	GL_DrawStr(GL_FONT_SEGOE14, 3, 1, "«»ÃÕ»…");
-	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, "ƒ»«≈À‹");
+	char s[] = "«»ÃÕ»…";
+	GL_DrawStr(GL_FONT_SEGOE14, 3, 1, s, sizeof(s));
+	char s2[] = "ƒ»«≈À‹";
+	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, s2, sizeof(s2));
 }
 void GLClock_Phrase6()
 {
+	char s[] = "¡≈√”Ÿ¿ﬂ";
+	unsigned char size  = sizeof(s);
 	int i, x = 64;
 	for(i=0; i<128; i++)
 	{
-		GL_DrawStr(GL_FONT_SEGOE14, 0, 0, "¡≈√”Ÿ¿ﬂ  ");
+		if(x>0)
+		{
+			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, 5);
+
+		}else
+		{
+			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, 5);
+		}
 		_delay_ms(1000);
 	}
 }
@@ -465,7 +496,7 @@ char GLClock_SetClockCorrect(unsigned char cmd)
 
 	GL_DrawChar(GL_FONT_SEGMENTAL28, 11, 2, '0');
 	GL_DrawChar(GL_FONT_SEGMENTAL28, 28, 2, '0' + ((val/10)? val % 10 : 10 - val));
-	GL_DrawStr(GL_FONT_SEGOE14, 45, 17, "—");
+	GL_DrawStr(GL_FONT_SEGOE14, 45, 17, "—", 1);
 	GL_DrawDots4(54, 28, 1);
 
 	return ret;
