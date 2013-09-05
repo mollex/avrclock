@@ -42,7 +42,8 @@ typedef struct
 	uint16_t		ymax;
 	uint16_t		xline;
 	uint16_t		yline;
-	uint8_t			vbuff[VBUFF_Y_LINE][VBUFF_X_LINE][16];
+	uint16_t		vbnum;
+	uint8_t			vbuff[2][VBUFF_Y_LINE][VBUFF_X_LINE][16];
 
 }VideoBuf_t;
 

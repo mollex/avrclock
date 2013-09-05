@@ -143,12 +143,16 @@ void gl_setpixel(unsigned char x, unsigned char y, unsigned int val)
 	uint16_t yline = y/16;
 	if(val)
 	{
-		_VideoBuf.vbuff[yline][xline][y%16] |= (1 << (x%8));
+		_VideoBuf.vbuff[_VideoBuf.vbnum][yline][xline][y%16] |= (1 << (x%8));
 	}
 	else
 	{
-		_VideoBuf.vbuff[yline][xline][y%16] &=  ~(1 << (x%8));
+		_VideoBuf.vbuff[_VideoBuf.vbnum][yline][xline][y%16] &=  ~(1 << (x%8));
 	}
+}
+void gl_vbnumtgl()
+{
+	_VideoBuf.vbnum = _VideoBuf.vbnum ? 0 : 1;
 }
 void GL_DrawLine(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, char color) {
 
@@ -216,7 +220,7 @@ int GL_DrawChar(unsigned char font, unsigned char x0, unsigned char y0, char ch)
 		}
 		y0++;
 	}
-	for(j=0; j<14; j++)
+	for(j=0; j<fontPtr->pt/fontPtr->heightPages; j++)
 	{
 		gl_setpixel(x0+i, y0--, 0);
 	}
@@ -258,6 +262,20 @@ char GL_GetCharSize(unsigned char font, char ch)
  * @return None.
  *
  *****************************************************************************/
+char GL_GetSpaceSize(unsigned char font)
+{
+	return _Font[font].spacePixels;
+}
+/****************************************************************************/
+/**
+ * @brief	 	‘ункци€
+ *
+ * @param None 	јргумент
+ *				русские верхний регистр от 0xC0 ... 0xDF
+ *				русские нижний регистр от 0xe0...0xFF
+ * @return None.
+ *
+ *****************************************************************************/
 void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str, unsigned char size)
 {
 	//tx_print_usart("\n\r Str  ");
@@ -275,6 +293,8 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 		++str;
 	}
 	while(--size);
+
+	gl_vbnumtgl();
 }
 /****************************************************************************/
 /**
@@ -336,20 +356,19 @@ void GLClock_Phrase5()
 	char s2[] = "ƒ»«≈Ћ№";
 	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, s2, sizeof(s2));
 }
-void GLClock_Phrase6()
+void GLClock_Phrase6(unsigned char font)
 {
 	char s[] = "12345678112233112233";
 	unsigned char size  = sizeof(s);
 	int i, strsize, index, x = 64;
 	char charsize, strlen;
-	//GL_DrawStr(GL_FONT_CONSOLAS, 0, 0, s, 5);
-	//_delay_ms(1000);
 
 	tx_print_usart("\n\r size  ");	tx_hexprint_usart(&(size), 1);
+
 	strlen = strsize = 0;
 	for(i=0; i<sizeof(s); i++)
 	{
-		strsize += GL_GetCharSize(GL_FONT_SEGOE14, s[i])+1;
+		strsize += GL_GetCharSize(font, s[i]) + GL_GetSpaceSize(font);
 		tx_print_usart("\n\r strsize  ");	tx_hexprint_usart(&(strsize), 2);
 		if((strsize > 78) && (strlen == 0))
 		{
@@ -362,13 +381,13 @@ void GLClock_Phrase6()
 	tx_print_usart("\n\r strlen  ");	tx_hexprint_usart(&(strlen), 1);
 
 	index = 0;
-	charsize = GL_GetCharSize(GL_FONT_SEGOE14, s[index]);
+	charsize = GL_GetCharSize(font, s[index]);
 
 	for(i=0; i<strsize; i++)
 	{
 		if(x>0)
 		{
-			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, s, strlen);
+			GL_DrawStr(font, x--, 0, s, strlen);
 
 		}else
 		{
@@ -376,9 +395,9 @@ void GLClock_Phrase6()
 			{
 				x = 0;
 				index++;
-				charsize = GL_GetCharSize(GL_FONT_SEGOE14, s[index]);
+				charsize = GL_GetCharSize(font, s[index]);
 			}
-			GL_DrawStr(GL_FONT_SEGOE14, x--, 0, &s[index], strlen);
+			GL_DrawStr(font, x--, 0, &s[index], strlen);
 		}
 		_delay_ms(40);
 	}

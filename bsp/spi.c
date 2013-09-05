@@ -39,6 +39,7 @@ volatile char spi_dmdchannel;
 volatile char spi_dmdrow;
 volatile char spi_dmdi;
 volatile char spi_dmdj;
+volatile char spi_dmdvbnum;
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************
@@ -59,7 +60,7 @@ ISR(SPI_STC_vect)
 	if(spi_dmdj != 0x10)
 	{
 		spi_dmdrow -=4;
-		SPDR = ~_VideoBuf.vbuff[spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
+		SPDR = ~_VideoBuf.vbuff[spi_dmdvbnum][spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
 
 		if(spi_dmdrow == 0)
 		{
@@ -88,7 +89,8 @@ void spi_send(char b)
 	spi_dmdrow = 12;
 	spi_dmdi= 0;
 	spi_dmdj = 1;
-	SPDR = ~_VideoBuf.vbuff[spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
+	spi_dmdvbnum = _VideoBuf.vbnum ? 0 : 1;
+	SPDR = ~_VideoBuf.vbuff[spi_dmdvbnum][spi_dmdj][spi_dmdi][spi_dmdrow + spi_dmdchannel];
 }
 /**<
  * **************************************************************************
