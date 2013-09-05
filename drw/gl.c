@@ -82,7 +82,7 @@ Font_t _Font[] =
 		.pt = 40,
 		.startChar = '0', //  Start character
 		.endChar = '9', //  End character
-		.spacePixels = 1, //  Width, in pixels, of space character
+		.spacePixels = 2, //  Width, in pixels, of space character
 		.charInfo = consolas_20ptDescriptors, //  Character descriptor array
 		.dataPtr = consolas_20ptBitmaps, //  Character bitmap array
 	},
@@ -153,6 +153,8 @@ void gl_setpixel(unsigned char x, unsigned char y, unsigned int val)
 void gl_vbnumtgl()
 {
 	_VideoBuf.vbnum = _VideoBuf.vbnum ? 0 : 1;
+	memset(&_VideoBuf.vbuff[_VideoBuf.vbnum], 0x00, sizeof(_VideoBuf.vbuff)/2);
+
 }
 void GL_DrawLine(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, char color) {
 
@@ -222,7 +224,7 @@ int GL_DrawChar(unsigned char font, unsigned char x0, unsigned char y0, char ch)
 	}
 	for(j=0; j<fontPtr->pt/fontPtr->heightPages; j++)
 	{
-		gl_setpixel(x0+i, y0--, 0);
+		gl_setpixel(x0+i, --y0, 0);
 	}
 	return (i + fontPtr->spacePixels);
 }
@@ -240,6 +242,9 @@ char GL_GetCharSize(unsigned char font, char ch)
 {
 	//tx_print_usart("\n\r Str  ");
 	char b;
+
+	if(ch == 0) return 0;
+
 	if(ch >= 0xC0)
 	{
 		b = ch - 0x90 + 10;
@@ -281,6 +286,8 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 	//tx_print_usart("\n\r Str  ");
 	char b;
 	do{
+		if(*str == 0) break;
+
 		if(*str >= 0xC0)
 		{
 		b = *str - 0x90 + 10;
@@ -291,6 +298,7 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 		x0 += GL_DrawChar(font, x0, y0, b);
 		//tx_hexprint_usart(&b, 1);
 		++str;
+
 	}
 	while(--size);
 
@@ -358,7 +366,7 @@ void GLClock_Phrase5()
 }
 void GLClock_Phrase6(unsigned char font)
 {
-	char s[] = "12345678112233112233";
+	char s[] = "12345";
 	unsigned char size  = sizeof(s);
 	int i, strsize, index, x = 64;
 	char charsize, strlen;
@@ -381,25 +389,18 @@ void GLClock_Phrase6(unsigned char font)
 	tx_print_usart("\n\r strlen  ");	tx_hexprint_usart(&(strlen), 1);
 
 	index = 0;
-	charsize = GL_GetCharSize(font, s[index]);
+	charsize = GL_GetCharSize(font, s[index]) + GL_GetSpaceSize(font);
 
 	for(i=0; i<strsize; i++)
 	{
-		if(x>0)
+		if(x<0 && fabs(x) >= charsize)
 		{
-			GL_DrawStr(font, x--, 0, s, strlen);
-
-		}else
-		{
-			if(fabs(x) > charsize)
-			{
-				x = 0;
-				index++;
-				charsize = GL_GetCharSize(font, s[index]);
-			}
-			GL_DrawStr(font, x--, 0, &s[index], strlen);
+			x = 0;
+			index++;
+			charsize = GL_GetCharSize(font, s[index]) + GL_GetSpaceSize(font);
 		}
-		_delay_ms(40);
+		GL_DrawStr(font, x--, 0, &s[index], strlen);
+		_delay_ms(20);
 	}
 }
 /****************************************************************************/

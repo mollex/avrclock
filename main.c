@@ -220,7 +220,7 @@ int main(void) {
 		_count++;
 		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
-		GLClock_Phrase6(GL_FONT_SEGOE14);
+		GLClock_Phrase6(GL_FONT_CONSOLAS);
 		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
 		_delay_ms(1000);
 

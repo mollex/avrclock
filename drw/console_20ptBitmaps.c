@@ -41,7 +41,7 @@
 unsigned char consolas_20ptBitmaps[] PROGMEM =
 {
 	// @0 '0' (13 pixels wide)
-/*	0xF0, 0x01, //     #####
+	0xF0, 0x01, //     #####
 	0xFC, 0x07, //   #########
 	0x1C, 0x0F, //   ###   ####
 	0x0E, 0x0E, //  ###     ###
@@ -230,20 +230,35 @@ unsigned char consolas_20ptBitmaps[] PROGMEM =
 	0xFE, 0x01, //  ########
 	0x7E, 0x00, //  ######
 
+/*	// @340 ':' (4 pixels wide)
+	0x06, //  ##
+	0x0F, // ####
+	0x0F, // ####
+	0x06, //  ##
+	0x00, //
+	0x00, //
+	0x00, //
+	0x00, //
+	0x00, //
+	0x06, //  ##
+	0x0F, // ####
+	0x0F, // ####
+	0x06, //  ##*/
+
 	// @340 ':' (4 pixels wide)
-	0x06, //  ##
-	0x0F, // ####
-	0x0F, // ####
-	0x06, //  ##
+	0x00, //  ##
+	0x00, // ####
+	0x00, // ####
+	0x00, //  ##
 	0x00, //
 	0x00, //
 	0x00, //
 	0x00, //
 	0x00, //
-	0x06, //  ##
-	0x0F, // ####
-	0x0F, // ####
-	0x06, //  ##
+	0x00, //  ##
+	0x00, // ####
+	0x00, // ####
+	0x00, //  ##
 
 	// @353 ';' (6 pixels wide)
 	0x18, //    ##
@@ -956,7 +971,7 @@ unsigned char consolas_20ptBitmaps[] PROGMEM =
 	0x0E, 0x0E, //  ###     ###
 	0x06, 0x0E, //  ##      ###
 	0x06, 0x0E, //  ##      ###
-	0x07, 0x0E, // ###      ###*/
+	0x07, 0x0E, // ###      ###
 
 };
 // Character descriptors for Consolas 20pt
