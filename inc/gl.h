@@ -58,10 +58,11 @@ void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 void GLClock_ShowTemp(unsigned char val, unsigned char sign);
 void GLClock_SetDots(char val);
 char GLClock_SetClockSetting(unsigned char cmd);
+char GLClock_SetClockCorrect(unsigned char cmd);
 
 void GLClock_Phrase1();
-void GLClock_Phrase2();
-void GLClock_Phrase3();
-void GLClock_Phrase4();
-void GLClock_Phrase5();
+void GLClock_Phrase2(char mode);
+void GLClock_Phrase3(char mode);
+void GLClock_Phrase4(char mode);
+void GLClock_Phrase5(char mode);
 #endif /* GL_H_ */

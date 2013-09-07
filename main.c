@@ -39,6 +39,7 @@ extern void ds1307_setTime(unsigned char hour, unsigned char min);
 
 unsigned char _val = 0;
 unsigned char _count = 0;
+unsigned char _text = 0;
 
 char Task_Temp(char count)
 {
@@ -48,7 +49,7 @@ char Task_Temp(char count)
 	if(count == 0)
 	{
 		tx_print_usart("\n\r Read Temp ");
-		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowTemp(ds18x20_GetHight(), ds18x20_Sign());
 		ds18x20_ReadTemp();
 
@@ -74,7 +75,7 @@ char Task_Clock(char count)
 		tx_print_usart("\n\r Clock Update ");
 		timedots= 1;
 		ds1307_update();
-		memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
+		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , timedots);
 
 
@@ -84,8 +85,50 @@ char Task_Clock(char count)
 	{
 		if((_count % 5) == 0)
 		{
-			GLClock_SetDots(++timedots & 0x01);
+			//GLClock_SetDots(++timedots & 0x01);
+			GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , ++timedots & 0x01);
 		}
+	}else
+	{
+		ret = 0;
+	}
+
+	return ret;
+}
+
+char Task_Text(char count)
+{
+	char ret = 1;
+
+	if(_text == 0) ret = 0;
+
+	if(count == 0)
+	{
+		tx_print_usart("\n\r Text Update ");
+		if(_text == IR_COM_RED)GLClock_Phrase2(0);
+		if(_text == IR_COM_GREEN)GLClock_Phrase3(0);
+		if(_text == IR_COM_BLUE)GLClock_Phrase4(0);
+		if(_text == IR_COM_YELLOW)GLClock_Phrase5(0);
+
+	}else if(_count == 15)
+	{
+		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
+		_delay_ms(300);
+			if(_text == IR_COM_RED)GLClock_Phrase2(63);
+			if(_text == IR_COM_GREEN)GLClock_Phrase3(63);
+			if(_text == IR_COM_BLUE)GLClock_Phrase4(63);
+			if(_text == IR_COM_YELLOW)GLClock_Phrase5(63);
+		_delay_ms(300);
+		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
+		_delay_ms(300);
+			if(_text == IR_COM_RED)GLClock_Phrase2(63);
+			if(_text == IR_COM_GREEN)GLClock_Phrase3(63);
+			if(_text == IR_COM_BLUE)GLClock_Phrase4(63);
+			if(_text == IR_COM_YELLOW)GLClock_Phrase5(63);
+
+	}else if(_count < 25)
+	{
+
 	}else
 	{
 		ret = 0;
@@ -115,29 +158,36 @@ void Task_Main()
 		}
 		else if(rc5cmd == IR_COM_RED)
 		{
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_Phrase2();
-			state = 0xF1;
+			//GLClock_Phrase2(0);
+			state = 0x2;
+			_count = 0;
+			_text = rc5cmd;
+
 		}else if(rc5cmd == IR_COM_GREEN)
 		{
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_Phrase3();
-			state = 0xF1;
+			//GLClock_Phrase3();
+			state = 0x2;
+			_count = 0;
+			_text = rc5cmd;
+
 		}else if(rc5cmd == IR_COM_BLUE)
 		{
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_Phrase4();
-			state = 0xF1;
+			//GLClock_Phrase4();
+			state = 0x2;
+			_count = 0;
+			_text = rc5cmd;
 		}else if(rc5cmd == IR_COM_YELLOW)
 		{
-			memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
-			GLClock_Phrase5();
-			state = 0xF1;
+			//GLClock_Phrase5();
+			state = 0x2;
+			_count = 0;
+			_text = rc5cmd;
 		}
 		else if(rc5cmd == IR_COM_ON)
 		{
 			state = 0;
 			_count = 0;
+			_text = 0;
 		}
 	}
 
@@ -158,11 +208,18 @@ void Task_Main()
 				_count = 0;
 			}
 			break;
+		case 2:
+			if(Task_Text(_count++) == 0)
+			{
+				state++;
+				_count = 0;
+			}
+		break;
 		case 0xE0:
 			if(isrc5)
 			{
-				if(GLClock_SetClockCorrect(rc5cmd)==0){
-					state = 0;
+				if(GLClock_SetClockCorrect(rc5cmd) == 0){
+					state = 0xFF;
 					_count = 0;
 				}
 			}
@@ -171,7 +228,7 @@ void Task_Main()
 			if(isrc5)
 			{
 				if(GLClock_SetClockSetting(rc5cmd)==0){
-					state = 0;
+					state = 0xFF;
 					_count = 0;
 				}
 			}
@@ -183,6 +240,8 @@ void Task_Main()
 			state = 0;
 			break;
 	}
+
+	rc5GetCmd(&rc5cmd);
 }
 
 
@@ -197,15 +256,15 @@ int main(void) {
 	/* Turn off WDT */
 	WDTCSR = 0x00;
 
-	//_delay_ms(500);
+	_delay_ms(500);
 
 	uart_init();
 	dmdp10_Init();
-	//GLClock_Phrase1();
-	//ds1307_init();
-	//ds18x20_ReadTemp();
-	//ds18x20_ReadTemp();
-	//rc5Init();
+	GLClock_Phrase1();
+	ds1307_init();
+	ds18x20_ReadTemp();
+	ds18x20_ReadTemp();
+	rc5Init();
 
 	//wdt_reset();
 	//wdt_enable(WDTO_120MS);
@@ -214,16 +273,18 @@ int main(void) {
 
 	sei();
 
-	tx_print_usart("\n\r GS Clock v2.02 ");
+	tx_print_usart("\n\r GS Clock v3.02 ");
 
 	while (1) {
-		_count++;
+
 		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
-		GLClock_Phrase6(GL_FONT_CONSOLAS);
-		memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
-		_delay_ms(1000);
+		//GLClock_Phrase2();
+	//	_delay_ms(1000);
+		//GLClock_Phrase6(GL_FONT_CONSOLAS);
+	//	memset(_VideoBuf.vbuff, 0x00, sizeof(_VideoBuf.vbuff));
+		_delay_ms(100);
 
-		//Task_Main();
+		Task_Main();
 	}
 }

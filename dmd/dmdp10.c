@@ -62,7 +62,7 @@ LED Panel Layout in RAM
 /************************** Constant Definitions ****************************/
 
 //#warning CHANGE THESE TO SEMI-ADJUSTABLE PIN DEFS!
-/*
+
 #define PIN_DMD_nOE       2    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
 #define PORT_DMD_nOE      PORTC
 #define DDR_DMD_nOE       DDRC
@@ -82,10 +82,10 @@ LED Panel Layout in RAM
 #define DDR_DMD_SCLK      DDRB  //
 
 #define PIN_DMD_R_DATA    3   // MOSI is SPI Master Out if SPI is used
-*/
+
 
 // Arduino test port
-
+/*
 #define PIN_DMD_nOE       1    // D9 active low Output Enable, setting this low lights all the LEDs in the selected rows. Can pwm it at very high frequency for brightness control.
 #define PORT_DMD_nOE      PORTB
 #define DDR_DMD_nOE       DDRB
@@ -105,6 +105,7 @@ LED Panel Layout in RAM
 #define DDR_DMD_SCLK      DDRB  //
 
 #define PIN_DMD_R_DATA    3   // MOSI is SPI Master Out if SPI is used
+*/
 /**************************** Type Definitions ******************************/
 
 /***************** Macros (Inline Functions) Definitions ********************/
@@ -154,7 +155,7 @@ ISR (TIMER2_OVF_vect)
 		 wdtcount = 0;
 	 }
 
-	 TCNT2 = 140;
+	// TCNT2 = 140;
 }
 /**<
  * **************************************************************************

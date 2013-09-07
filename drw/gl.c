@@ -137,7 +137,7 @@ extern void ds1307_setTime(unsigned char hour, unsigned char min);
  *****************************************************************************/
 void gl_setpixel(unsigned char x, unsigned char y, unsigned int val)
 {
-	if(x > _VideoBuf.xmax || y > _VideoBuf.ymax)	return;
+	if(x >= _VideoBuf.xmax || y >= _VideoBuf.ymax)	return;
 
 	uint16_t xline  = x/8;
 	uint16_t yline = y/16;
@@ -155,6 +155,18 @@ void gl_vbnumtgl()
 	_VideoBuf.vbnum = _VideoBuf.vbnum ? 0 : 1;
 	memset(&_VideoBuf.vbuff[_VideoBuf.vbnum], 0x00, sizeof(_VideoBuf.vbuff)/2);
 
+}
+void GL_ClearSector(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, char color) {
+
+	unsigned char stepx, stepy;
+
+	for(stepx = x0; stepx<x1; stepx++)
+	{
+		for(stepy = y0; stepy<y1; stepy++)
+		{
+			gl_setpixel(stepx,  stepy, color);
+		}
+	}
 }
 void GL_DrawLine(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, char color) {
 
@@ -281,7 +293,7 @@ char GL_GetSpaceSize(unsigned char font)
  * @return None.
  *
  *****************************************************************************/
-void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str, unsigned char size)
+void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *str, unsigned char size, char sw)
 {
 	//tx_print_usart("\n\r Str  ");
 	char b;
@@ -302,7 +314,7 @@ void GL_DrawStr(unsigned char font, unsigned char x0, unsigned char y0, char *st
 	}
 	while(--size);
 
-	gl_vbnumtgl();
+	if(sw)gl_vbnumtgl();
 }
 /****************************************************************************/
 /**
@@ -332,37 +344,72 @@ void GL_DrawDots4(uint16_t x0, uint16_t y0, char val)
 void GLClock_Phrase1()
 {
 	char s[] = "ÇÀÃÐÓÇ";
-	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, s, sizeof(s));
+	GL_DrawStr(GL_FONT_SEGOE14, 8, 8, s, sizeof(s), 1);
 	GL_DrawDots4(60, 17, 1);
 }
-void GLClock_Phrase2()
+void GLClock_Phrase2(char mode)
 {
+	int i;
 	char s[] = "ÒÅÕ";
-	GL_DrawStr(GL_FONT_SEGOE14, 21, 1, s, sizeof(s));
-	GL_DrawDots4(47, 12, 1);
 	char s2[] = "ÏÅÐÅÐÛÂ";
-	GL_DrawStr(GL_FONT_SEGOE14, 3, 16, s2, sizeof(s2));
+
+	for(i = mode; i<64; i++)
+	{
+		_Font[GL_FONT_SEGOE14].spacePixels = 2;
+		GL_DrawStr(GL_FONT_SEGOE14, 18, 2, s, sizeof(s), 0);
+		GL_DrawDots4(47, 13, 1);
+
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 17, s2, sizeof(s2), 0);
+		_Font[GL_FONT_SEGOE14].spacePixels = 1;
+
+		GL_ClearSector(i, 0, 64, 32, 0);
+		gl_vbnumtgl();
+		//_delay_ms(5);
+	}
 }
-void GLClock_Phrase3()
+void GLClock_Phrase3(char mode)
 {
+	int i;
 	char s[] = "ÑËÈÂ";
-	GL_DrawStr(GL_FONT_SEGOE14, 16, 1, s, sizeof(s));
 	char s2[] = "Ò0ÏËÈÂÀ";
-	GL_DrawStr(GL_FONT_SEGOE14, 0, 16, s2, sizeof(s2));
-	//GL_DrawDots4(58, 27, 1);
+
+	for(i = mode; i<64; i++)
+	{
+		GL_DrawStr(GL_FONT_SEGOE14, 16, 2, s, sizeof(s), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 17, s2, sizeof(s2), 0);
+		//GL_DrawDots4(58, 27, 1);
+
+		GL_ClearSector(i, 0, 64, 32, 0);
+		gl_vbnumtgl();
+	}
 }
-void GLClock_Phrase4()
+void GLClock_Phrase4(char mode)
 {
+	int i;
 	char s[] = "ÑÏÀÑÈÁ0";
-	GL_DrawStr(GL_FONT_SEGOE14, 0, 2, s, sizeof(s));
-	//GL_DrawDots4(60, 11, 1);
+
+	for(i = mode; i<64; i++)
+	{
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 9, s, sizeof(s), 0);
+
+		GL_ClearSector(i, 0, 64, 32, 0);
+		gl_vbnumtgl();
+	}
 }
-void GLClock_Phrase5()
+void GLClock_Phrase5(char mode)
 {
+	int i;
 	char s[] = "ÇÈÌÍÈÉ";
-	GL_DrawStr(GL_FONT_SEGOE14, 3, 1, s, sizeof(s));
 	char s2[] = "ÄÈÇÅËÜ";
-	GL_DrawStr(GL_FONT_SEGOE14, 7, 16, s2, sizeof(s2));
+
+	for(i = mode; i<64; i++)
+	{
+		GL_DrawStr(GL_FONT_SEGOE14, 3, 2, s, sizeof(s), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 7, 17, s2, sizeof(s2), 0);
+
+		GL_ClearSector(i, 0, 64, 32, 0);
+		gl_vbnumtgl();
+	}
 }
 void GLClock_Phrase6(unsigned char font)
 {
@@ -399,7 +446,7 @@ void GLClock_Phrase6(unsigned char font)
 			index++;
 			charsize = GL_GetCharSize(font, s[index]) + GL_GetSpaceSize(font);
 		}
-		GL_DrawStr(font, x--, 0, &s[index], strlen);
+		GL_DrawStr(font, x--, 0, &s[index], strlen, 1);
 		_delay_ms(20);
 	}
 }
@@ -435,6 +482,7 @@ void GLClock_SetTemp(unsigned char font, unsigned char val, unsigned char sign)
 	GL_DrawLine(48, 4, 48, 7, 1);
 
 	GLClock_SetSign(sign);
+	gl_vbnumtgl();
 }
 
 void GLClock_ShowTemp(unsigned char val, unsigned char sign)
@@ -481,6 +529,7 @@ void GLClock_ShowClock(unsigned char hour, unsigned char min, unsigned char dot)
 	GLClock_SetHour(GL_FONT_SEGMENTAL28, hour);
 	GLClock_SetMinutes(GL_FONT_SEGMENTAL28, min);
 	GLClock_SetDots(dot);
+	gl_vbnumtgl();
 }
 void GLClock_SetCursor(unsigned int x0, unsigned int y0)
 {
@@ -541,7 +590,7 @@ char GLClock_SetClockSetting(unsigned char cmd)
 	if(val[1] == 0xFF)GLClock_SetCursor(17,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 16, 2, val[1] + '0');
 	if(val[2] == 0xFF)GLClock_SetCursor(33,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 34, 2, val[2] + '0');
 	if(val[3] == 0xFF)GLClock_SetCursor(51,26);else GL_DrawChar(GL_FONT_SEGMENTAL28, 50, 2, val[3] + '0');
-
+	gl_vbnumtgl();
 	return ret;
 }
 
@@ -576,8 +625,8 @@ char GLClock_SetClockCorrect(unsigned char cmd)
 
 	GL_DrawChar(GL_FONT_SEGMENTAL28, 11, 2, '0');
 	GL_DrawChar(GL_FONT_SEGMENTAL28, 28, 2, '0' + ((val/10)? val % 10 : 10 - val));
-	GL_DrawStr(GL_FONT_SEGOE14, 45, 17, "Ñ", 1);
+	GL_DrawStr(GL_FONT_SEGOE14, 45, 17, "Ñ", 1, 0);
 	GL_DrawDots4(54, 28, 1);
-
+	gl_vbnumtgl();
 	return ret;
 }
