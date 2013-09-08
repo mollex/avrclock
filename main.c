@@ -75,7 +75,6 @@ char Task_Clock(char count)
 		tx_print_usart("\n\r Clock Update ");
 		timedots= 1;
 		ds1307_update();
-		//memset(_VideoBuf.vbuff, 0x0, sizeof(_VideoBuf.vbuff));
 		GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , timedots);
 
 
@@ -85,7 +84,6 @@ char Task_Clock(char count)
 	{
 		if((_count % 5) == 0)
 		{
-			//GLClock_SetDots(++timedots & 0x01);
 			GLClock_ShowClock(ds1307_gethour(), ds1307_getmin() , ++timedots & 0x01);
 		}
 	}else
@@ -266,8 +264,8 @@ int main(void) {
 	ds18x20_ReadTemp();
 	rc5Init();
 
-	//wdt_reset();
-	//wdt_enable(WDTO_120MS);
+	wdt_reset();
+	wdt_enable(WDTO_120MS);
 
 
 
@@ -277,7 +275,7 @@ int main(void) {
 
 	while (1) {
 
-		tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
+		//tx_print_usart("\n\r C  ");	tx_hexprint_usart(&(_count), 1);
 
 		//GLClock_Phrase2();
 	//	_delay_ms(1000);

@@ -402,14 +402,16 @@ void GLClock_Phrase5(char mode)
 	char s[] = "«»ÃÕ»…";
 	char s2[] = "ƒ»«≈À‹";
 
+	_Font[GL_FONT_SEGOE14].spacePixels = 2;
 	for(i = mode; i<64; i++)
 	{
-		GL_DrawStr(GL_FONT_SEGOE14, 3, 2, s, sizeof(s), 0);
-		GL_DrawStr(GL_FONT_SEGOE14, 7, 17, s2, sizeof(s2), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 2, s, sizeof(s), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 3, 17, s2, sizeof(s2), 0);
 
 		GL_ClearSector(i, 0, 64, 32, 0);
 		gl_vbnumtgl();
 	}
+	_Font[GL_FONT_SEGOE14].spacePixels = 1;
 }
 void GLClock_Phrase6(unsigned char font)
 {
