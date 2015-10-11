@@ -28,6 +28,7 @@
 #define GL_FONT_SEGMENTAL28		0
 #define GL_FONT_SEGOE14			1
 #define GL_FONT_CONSOLAS		2
+#define GL_FONT_SEGOE12			3
 
 #define VBUFF_X_MAX		64
 #define VBUFF_Y_MAX		32

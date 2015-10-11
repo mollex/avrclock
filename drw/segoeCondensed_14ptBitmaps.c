@@ -11,7 +11,7 @@
 ******************************************************************************/
 /*****************************************************************************/
 /**
-* @file font_courierNew8pt.c
+* @file segoeCondensed_14ptBitmaps.c
 *
 * Put short file description here  !
 *
@@ -57,8 +57,8 @@ unsigned char segoeCondensed_14ptBitmaps[]  PROGMEM =
 			0x1C, //   ###
 
 			// @13 '1' (6 pixels wide)
-			0x0E, //  ###
-			0x0F, // ####
+			0x3F, // ######
+			0x3F, // ######
 			0x0C, //   ##
 			0x0C, //   ##
 			0x0C, //   ##

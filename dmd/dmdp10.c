@@ -149,13 +149,13 @@ ISR (TIMER2_OVF_vect)
 	 dmdp10_Scan();
 
 	 //reset every 4ms*27 = 100 ms;
-	 if(wdtcount++ > 25)
+	 if(wdtcount++ > 50)
 	 {
 		 wdt_reset();
 		 wdtcount = 0;
 	 }
 
-	// TCNT2 = 140;
+	 TCNT2 = 128;
 }
 /**<
  * **************************************************************************

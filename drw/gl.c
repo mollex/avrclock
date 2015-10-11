@@ -55,6 +55,9 @@ extern  unsigned char segoeCondensed_14ptBitmaps[];
 extern  FontChar_t consolas_20ptDescriptors[];
 extern  unsigned char consolas_20ptBitmaps[];
 
+extern  FontChar_t segoeCondensed_12ptDescriptors[];
+extern  unsigned char segoeCondensed_12ptBitmaps[];
+
 // Font information for Courier New 8pt
 Font_t _Font[] =
 {
@@ -72,7 +75,7 @@ Font_t _Font[] =
 		.pt = 28,
 		.startChar = '0', //  Start character
 		.endChar = '9', //  End character
-		.spacePixels = 1, //  Width, in pixels, of space character
+		.spacePixels = 2, //  Width, in pixels, of space character
 		.charInfo = segoeCondensed_14ptDescriptors, //  Character descriptor array
 		.dataPtr = segoeCondensed_14ptBitmaps, //  Character bitmap array
 	},
@@ -85,6 +88,16 @@ Font_t _Font[] =
 		.spacePixels = 2, //  Width, in pixels, of space character
 		.charInfo = consolas_20ptDescriptors, //  Character descriptor array
 		.dataPtr = consolas_20ptBitmaps, //  Character bitmap array
+	},
+
+	{
+		.heightPages = 2, //  Character height
+		.pt = 40,
+		.startChar = '0', //  Start character
+		.endChar = '9', //  End character
+		.spacePixels = 1, //  Width, in pixels, of space character
+		.charInfo = segoeCondensed_12ptDescriptors, //  Character descriptor array
+		.dataPtr = segoeCondensed_12ptBitmaps, //  Character bitmap array
 	},
 };
 
@@ -341,6 +354,23 @@ void GL_DrawDots4(uint16_t x0, uint16_t y0, char val)
  * @return None.
  *
  *****************************************************************************/
+void GL_DrawComma4(uint16_t x0, uint16_t y0, char val)
+{
+	gl_setpixel(x0, y0, val);
+	gl_setpixel((x0 + 1), y0, val);
+	gl_setpixel((x0 + 1), (y0 + 1), val);
+	gl_setpixel(x0, (y0 + 1), val);
+	gl_setpixel((x0 + 1), (y0 + 2), val);
+}
+/****************************************************************************/
+/**
+ * @brief	 	‘ÛÌÍˆËˇ
+ *
+ * @param None 	¿„ÛÏÂÌÚ
+ *
+ * @return None.
+ *
+ *****************************************************************************/
 void GLClock_Phrase1()
 {
 	char s[] = "«¿√–”«";
@@ -350,17 +380,20 @@ void GLClock_Phrase1()
 void GLClock_Phrase2(char mode)
 {
 	int i;
-	char s[] = "“≈’";
-	char s2[] = "œ≈–≈–€¬";
-
+	char s[] = "¡ŒÀ‹ÿ";
+	char s2[] = "◊€Ã";
+	char s3[] = "¿«—";
 	for(i = mode; i<64; i++)
 	{
-		_Font[GL_FONT_SEGOE14].spacePixels = 2;
-		GL_DrawStr(GL_FONT_SEGOE14, 18, 2, s, sizeof(s), 0);
-		GL_DrawDots4(47, 13, 1);
 
-		GL_DrawStr(GL_FONT_SEGOE14, 0, 17, s2, sizeof(s2), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 5, 2, s, sizeof(s), 0);
+		GL_DrawComma4(58, 13, 1);
+
 		_Font[GL_FONT_SEGOE14].spacePixels = 1;
+		GL_DrawStr(GL_FONT_SEGOE14, 0, 17, s2, sizeof(s2), 0);
+		_Font[GL_FONT_SEGOE14].spacePixels = 2;
+
+		GL_DrawStr(GL_FONT_SEGOE14, 35, 17, s3, sizeof(s3), 0);
 
 		GL_ClearSector(i, 0, 64, 32, 0);
 		gl_vbnumtgl();
@@ -370,13 +403,13 @@ void GLClock_Phrase2(char mode)
 void GLClock_Phrase3(char mode)
 {
 	int i;
-	char s[] = "—À»¬";
-	char s2[] = "“0œÀ»¬¿";
+	char s[] = "¬1“¿≈Ã";
+	char s2[] = "¬¿—";
 
 	for(i = mode; i<64; i++)
 	{
-		GL_DrawStr(GL_FONT_SEGOE14, 16, 2, s, sizeof(s), 0);
-		GL_DrawStr(GL_FONT_SEGOE14, 0, 17, s2, sizeof(s2), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 3, 2, s, sizeof(s), 0);
+		GL_DrawStr(GL_FONT_SEGOE14, 17, 17, s2, sizeof(s2), 0);
 		//GL_DrawDots4(58, 27, 1);
 
 		GL_ClearSector(i, 0, 64, 32, 0);
@@ -386,11 +419,15 @@ void GLClock_Phrase3(char mode)
 void GLClock_Phrase4(char mode)
 {
 	int i;
-	char s[] = "—œ¿—»¡0";
+	char s[] = "“›’Õ1◊Õ€";
+	char s2[] = "œ≈–¿œ€Õ¿ ";
 
 	for(i = mode; i<64; i++)
 	{
-		GL_DrawStr(GL_FONT_SEGOE14, 0, 9, s, sizeof(s), 0);
+		_Font[GL_FONT_SEGOE12].spacePixels = 2;
+		GL_DrawStr(GL_FONT_SEGOE12, 0, 2, s, sizeof(s), 0);
+		_Font[GL_FONT_SEGOE12].spacePixels = 1;
+		GL_DrawStr(GL_FONT_SEGOE12, 0, 17, s2, sizeof(s2), 0);
 
 		GL_ClearSector(i, 0, 64, 32, 0);
 		gl_vbnumtgl();
@@ -399,19 +436,21 @@ void GLClock_Phrase4(char mode)
 void GLClock_Phrase5(char mode)
 {
 	int i;
-	char s[] = "«»ÃÕ»…";
-	char s2[] = "ƒ»«≈À‹";
+	char s[] = "◊¿—Œ¬¿";
+	char s2[] = "Õ≈";
+	char s3[] = "œ–¿÷”≈";
 
-	_Font[GL_FONT_SEGOE14].spacePixels = 2;
 	for(i = mode; i<64; i++)
 	{
-		GL_DrawStr(GL_FONT_SEGOE14, 0, 2, s, sizeof(s), 0);
-		GL_DrawStr(GL_FONT_SEGOE14, 3, 17, s2, sizeof(s2), 0);
+		_Font[GL_FONT_SEGOE12].spacePixels = 2;
+		GL_DrawStr(GL_FONT_SEGOE12, 7, 2, s, sizeof(s), 0);
+		_Font[GL_FONT_SEGOE12].spacePixels = 1;
+		GL_DrawStr(GL_FONT_SEGOE12, 0, 17, s2, sizeof(s2), 0);
+		GL_DrawStr(GL_FONT_SEGOE12, 20, 17, s3, sizeof(s3), 0);
 
 		GL_ClearSector(i, 0, 64, 32, 0);
 		gl_vbnumtgl();
 	}
-	_Font[GL_FONT_SEGOE14].spacePixels = 1;
 }
 void GLClock_Phrase6(unsigned char font)
 {
