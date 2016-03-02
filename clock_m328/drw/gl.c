@@ -47,16 +47,16 @@ extern void Eprom_MjrSave(unsigned char addr, char val);
 extern char Eprom_MjrLoad(unsigned char addr);
 /************************** Variable Definitions ****************************/
 extern  FontChar_t segmental_28ptDescriptors[];
-extern  unsigned char segmental_28ptBitmaps[];
+extern  const unsigned char segmental_28ptBitmaps[];
 
 extern  FontChar_t segoeCondensed_14ptDescriptors[];
-extern  unsigned char segoeCondensed_14ptBitmaps[];
+extern  const unsigned char segoeCondensed_14ptBitmaps[];
 
 extern  FontChar_t consolas_20ptDescriptors[];
-extern  unsigned char consolas_20ptBitmaps[];
+extern  const unsigned char consolas_20ptBitmaps[];
 
 extern  FontChar_t segoeCondensed_12ptDescriptors[];
-extern  unsigned char segoeCondensed_12ptBitmaps[];
+extern  const unsigned char segoeCondensed_12ptBitmaps[];
 
 // Font information for Courier New 8pt
 Font_t _Font[] =

@@ -35,11 +35,11 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
-volatile char spi_dmdchannel;
-volatile char spi_dmdrow;
-volatile char spi_dmdi;
-volatile char spi_dmdj;
-volatile char spi_dmdvbnum;
+volatile int spi_dmdchannel;
+volatile int spi_dmdrow;
+volatile int spi_dmdi;
+volatile int spi_dmdj;
+volatile int spi_dmdvbnum;
 /************************** Function Prototypes ******************************/
 /**<
  * **************************************************************************

@@ -43,7 +43,7 @@
 //
 
 // Character bitmaps for Segoe Condensed 12pt
-unsigned char  segoeCondensed_12ptBitmaps[] PROGMEM =
+const unsigned char  segoeCondensed_12ptBitmaps[] PROGMEM =
 {
 	// @0 '0' (5 pixels wide)
 	0x0E, //  ###

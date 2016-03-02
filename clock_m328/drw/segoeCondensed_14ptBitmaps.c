@@ -39,7 +39,7 @@
 /************************** Function Prototypes *****************************/
 
 // Character bitmaps for Segoe Condensed 14pt
-unsigned char segoeCondensed_14ptBitmaps[]  PROGMEM =
+const unsigned char segoeCondensed_14ptBitmaps[]  PROGMEM =
 {
 		// @0 '0' (7 pixels wide)
 			0x1C, //   ###

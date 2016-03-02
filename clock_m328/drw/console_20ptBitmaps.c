@@ -38,7 +38,7 @@
 /************************** Function Prototypes *****************************/
 
 // Character bitmaps for Consolas 20pt
-unsigned char consolas_20ptBitmaps[] PROGMEM =
+const unsigned char consolas_20ptBitmaps[] PROGMEM =
 {
 	// @0 '0' (13 pixels wide)
 	0xF0, 0x01, //     #####
