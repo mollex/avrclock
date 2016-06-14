@@ -17,3 +17,7 @@ Crystal 32768 Гц
 
 Crystal 16.000 мГц
 
+Real video
+
+https://www.youtube.com/watch?v=7xwmAovFiZE
+
