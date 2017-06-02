@@ -17,7 +17,6 @@ Crystal 32768 Гц
 
 Crystal 16.000 мГц
 
-Real video
-
-https://www.youtube.com/watch?v=7xwmAovFiZE
+Sheme and PCB http://github.com/mollex/avrclock/wiki
+Real video    http://www.youtube.com/watch?v=7xwmAovFiZE
 
